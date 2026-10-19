@@ -32,7 +32,7 @@
   const items=(a,fn)=>arr(a,x=>x&&str(x.id,100)&&x.id.length>0&&fn(x))&&new Set(a.map(x=>x.id)).size===a.length;
   const ids=a=>arr(a,x=>str(x,100))&&new Set(a).size===a.length;
   const waterOK=a=>items(a,x=>time(x.time)&&num(x.ml,10000)&&x.ml>0);
-  const careCategory=x=>x.category==='self'||(legacy&&x.category==='pet');
+  const careCategory=x=>(x.category==='self'||(legacy&&x.category==='pet'))&&(x.period===undefined||['morning','afternoon'].includes(x.period));
   const mealDetails=x=>(x.time===undefined||x.time===''||time(x.time))&&(x.portion===undefined||str(x.portion,200))&&(x.source===undefined||['manual','photo-ai'].includes(x.source));
   if(!s||s.version!==1||!s.settings||!str(s.settings.name,80)||!num(s.settings.waterReference,20000)||!waterOK(s.water)||!s.workouts||!arr(s.week,x=>['A','B','rest','active'].includes(x),7)||s.week.length!==7)fail();
   for(const k of ['A','B','rest','active']){const w=s.workouts[k];if(!w||!str(w.title,200)||!items(w.exercises,x=>str(x.name,200)&&num(x.sets,100)&&Number.isInteger(x.sets)&&x.sets>0&&str(x.reps,200)&&str(x.note)))fail();}

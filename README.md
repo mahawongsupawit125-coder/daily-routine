@@ -173,3 +173,7 @@ start.cmd          ตัวเปิดสำหรับ Windows
 upload-github.cmd  อัปโหลด commit จากโฟลเดอร์ Git บน Windows
 .github/workflows/ ตรวจสอบเมื่อ push และเผยแพร่ Pages ด้วยตัวเอง
 ```
+# Self-care periods (2026-10-19 update)
+
+The self-care page now has morning and afternoon sections with an Add button in each section. The editor can change the period, title, and notes. Existing items without a period remain under an unassigned section until the user selects a period. Existing IDs and daily completion records are preserved. Items remain shared across dates; completion remains per day and browser-local.
+

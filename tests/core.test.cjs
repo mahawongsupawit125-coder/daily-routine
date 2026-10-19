@@ -1,6 +1,12 @@
 const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const C=require('../dist/core.js');
+test('care periods survive backups without changing legacy records or daily completion',()=>{
+ const s=C.createState(),d=C.day(s,'2026-10-20');d.care=['c0'];
+ s.care.push({id:'morning-item',title:'เช้า',category:'self',period:'morning',note:''},{id:'afternoon-item',title:'บ่าย',category:'self',period:'afternoon',note:''});
+ assert.deepEqual(C.parseImport(JSON.stringify(s)),s);
+ s.care.at(-1).period='invalid';assert.throws(()=>C.parseImport(JSON.stringify(s)));
+});
 test('default water plan is eleven 300ml slots and reference is optional',()=>{
  const s=C.createState(); assert.equal(s.water.length,11); assert.equal(s.water.reduce((a,b)=>a+b.ml,0),3300); assert.equal(s.settings.waterReference,3300);
 });

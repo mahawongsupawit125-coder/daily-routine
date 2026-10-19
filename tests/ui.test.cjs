@@ -5,6 +5,28 @@ const path=require('node:path');
 const {JSDOM,VirtualConsole}=require('jsdom');
 const C=require('../dist/core.js');
 const KEY='jai-daily.v1';
+test('care morning and afternoon lists support adding moving editing deleting and daily persistence',t=>{
+ const a=setup(t);a.date('2026-10-20');a.page('care');
+ assert.match(a.q('[data-care-period="morning"]').textContent,/ดูแลตัวเองตอนเช้า/);
+ assert.match(a.q('[data-care-period="afternoon"]').textContent,/ดูแลตัวเองตอนบ่าย/);
+ for(const period of ['morning','afternoon']){
+  a.click(`[data-care-period="${period}"] [data-action="care-add"]`);
+  assert.equal(a.q('[name="period"]').value,period);a.values({title:'รายการ '+period,note:'ส่วนตัว'});a.submit();
+ }
+ const s=a.stored(),morning=s.care.find(x=>x.period==='morning'),afternoon=s.care.find(x=>x.period==='afternoon');
+ a.click(`[data-action="care-toggle"][data-id="${morning.id}"]`);
+ a.click('[data-action="care-toggle"][data-id="c0"]');
+ a.click('[data-action="care-edit"][data-id="c0"]');a.values({period:'afternoon'});a.submit();
+ assert.ok(a.q('[data-care-period="afternoon"] [data-id="c0"]'));
+ assert.ok(a.stored().days['2026-10-20'].care.includes('c0'));
+ a.click(`[data-action="care-edit"][data-id="${afternoon.id}"]`);a.values({title:'แก้บ่าย'});a.submit();
+ const b=setup(t,{raw:JSON.stringify(a.stored())});b.date('2026-10-20');b.page('care');
+ assert.equal(b.q(`[data-action="care-toggle"][data-id="${morning.id}"]`).getAttribute('aria-pressed'),'true');
+ assert.match(b.q('[data-care-period="afternoon"]').textContent,/แก้บ่าย/);
+ b.date('2026-10-21');assert.equal(b.q(`[data-action="care-toggle"][data-id="${morning.id}"]`).getAttribute('aria-pressed'),'false');
+ b.click(`[data-action="care-edit"][data-id="${afternoon.id}"]`);b.click('#deleteItem');b.click('#deleteItem');
+ assert.equal(b.stored().care.some(x=>x.id===afternoon.id),false);
+});
 function setup(t,{width=1440,raw=null,blocked=false}={}){
  const errors=[],downloads=[];
  const vc=new VirtualConsole();vc.on('jsdomError',err=>errors.push(err.message));

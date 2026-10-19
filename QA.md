@@ -43,3 +43,10 @@
 ## ไม่อยู่ใน MVP
 
 บัญชีผู้ใช้, backend sync, push notification, service worker สำหรับเปิดใหม่แบบ offline, การตรวจสอบฉลากจากบริการภายนอก และคำแนะนำสารอาหารเฉพาะบุคคล
+# Self-care periods verification (2026-10-19)
+
+- Added backup validation and UI interaction coverage for morning/afternoon items, moving a legacy item without losing completion, reload, separate dates, edit, and delete.
+- Syntax checks passed locally. Core/API/photo tests: 24 passed.
+- Local full-suite execution is blocked: npm ci cannot complete dependency downloads; UI tests cannot load jsdom. Seven local server tests fail with EACCES connecting to loopback in this sandbox.
+- Browser rendering has not been verified in this session. GitHub Actions results should be checked before publication.
+
