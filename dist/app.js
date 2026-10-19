@@ -12,12 +12,26 @@
  const routes={dashboard:['ภาพรวม','วันของคุณ','ภาพเล็ก ๆ ของการดูแลตัวเองในแต่ละวัน'],water:['ดื่มน้ำ','เติมความสดชื่น','บันทึกทีละแก้ว ดูยอดเปลี่ยนทันที'],schedule:['ตารางชีวิตรายวัน','จัดวันให้เป็นจังหวะ','วางแผน ปรับเปลี่ยน และเริ่มใหม่ได้เสมอ'],workout:['ออกกำลังกาย','ขยับร่างกาย ใจสบาย','แผนที่ยืดหยุ่นได้ตามความพร้อมของคุณ'],meals:['อาหาร / สารอาหาร','ทุกมื้อของวันนี้','บันทึกเพื่อรู้จักตัวเอง โดยไม่มีโควตาแคลอรี'],care:['ดูแลตัวเองและกระแต','ดูแลกันในทุกวัน','พื้นที่เล็ก ๆ ของคุณและเจ้ากระแต'],settings:['ตั้งค่า','พื้นที่ในแบบของคุณ','จัดการค่าพื้นฐานและสำรองข้อมูล']};
  let storageBlocked=false,rawBackup=null,state,storageIssue='';
  try{rawBackup=localStorage.getItem(KEY);state=rawBackup===null?C.createState():C.parseImport(rawBackup);}catch(err){state=C.createState();storageBlocked=true;storageIssue=rawBackup!==null?'อ่านข้อมูลเดิมไม่ได้ ข้อมูลเดิมยังไม่ถูกเขียนทับ กรุณาดาวน์โหลดสำรองก่อนเริ่มใหม่':'เบราว์เซอร์ไม่อนุญาตให้บันทึก ขณะนี้ข้อมูลอยู่ชั่วคราว ควรส่งออก JSON ก่อนปิดหน้า';}
+ routes.history=['ประวัติรายวัน','วันที่คุณบันทึกไว้','เปิดดูและแก้ไขข้อมูลของแต่ละวันได้เสมอ'];
+ let savedDates=new Set(rawBackup!==null&&!storageBlocked?Object.keys(state.days):[]),historyMonth='',historyLimit=20;
  let date=localDate(),page=Object.hasOwn(routes,location.hash.slice(1))?location.hash.slice(1):'dashboard',editor=null,toastTimer,deleteArmed=false;
  const d=()=>C.day(state,date),stats=()=>C.waterStats(state,date);
  function toast(message){$('#toast').textContent=message;$('#toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').hidden=true,3500);}
- function save(message){
-  if(!storageBlocked){try{localStorage.setItem(KEY,JSON.stringify(state));$('#saveState').textContent='บันทึกแล้วในเครื่อง';}catch(err){storageBlocked=true;storageIssue='บันทึกไม่สำเร็จ พื้นที่อาจเต็มหรือเบราว์เซอร์จำกัดการบันทึก ส่งออก JSON เพื่อเก็บข้อมูลก่อนปิดหน้า';}}
+ function save(message,stamp=true){
+  if(!storageBlocked){const day=stamp?d():null,previous=day?.savedAt;try{if(day)day.savedAt=new Date().toISOString();localStorage.setItem(KEY,JSON.stringify(state));savedDates=new Set(Object.keys(state.days));}catch(err){if(day){if(previous===undefined)delete day.savedAt;else day.savedAt=previous;}storageBlocked=true;storageIssue='บันทึกไม่สำเร็จ พื้นที่อาจเต็มหรือเบราว์เซอร์จำกัดการบันทึก ส่งออก JSON เพื่อเก็บข้อมูลก่อนปิดหน้า';}}
+  updateSaveStatus();
   if(storageBlocked){$('#saveState').textContent='ยังไม่ได้บันทึกถาวร';if(message)toast('ยังบันทึกในเครื่องไม่ได้ · ส่งออก JSON เพื่อสำรอง');}else if(message)toast(message);
+ }
+ const savedTime=value=>new Date(value).toLocaleString('th-TH',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'});
+ function updateSaveStatus(){
+  const day=state.days[date],saved=savedDates.has(date);
+  $('#saveState').textContent=storageBlocked?'ยังไม่ได้บันทึกถาวร':saved?'บันทึกแล้วในเครื่อง':'บันทึกอัตโนมัติ';
+  $('#dailySaveStatus').textContent=storageBlocked?'ยังไม่ได้บันทึกถาวร · ส่งออก JSON เพื่อสำรองข้อมูล':saved?(day.savedAt?'บันทึกล่าสุด '+savedTime(day.savedAt):'บันทึกเดิมในเครื่อง · ไม่ทราบเวลาบันทึก'):'ยังไม่มีบันทึกของวันที่เลือก · กดบันทึกเพื่อเก็บวันนี้';
+  $('#dailySaveDate').textContent=thaiDate(date);
+ }
+ function dailyHistory(){
+  const dates=[...savedDates].filter(t=>state.days[t]&&(!historyMonth||t.startsWith(historyMonth))).sort().reverse();
+  return `${notice('ข้อมูลเก็บแยกตามวันในเบราว์เซอร์นี้ · แก้ไขแล้วบันทึกอัตโนมัติ · สำรอง JSON ได้ที่ตั้งค่า')}<div class="section-actions"><div><h2>บันทึกของคุณ</h2><p>${n(dates.length)} วัน${historyMonth?'ในเดือนที่เลือก':''}</p></div><label class="history-filter">เลือกเดือน <input id="historyMonth" type="month" min="2000-01" max="2100-12" value="${e(historyMonth)}"></label>${historyMonth?btn('ดูทุกเดือน','history-clear'):''}</div>${dates.length?`<div class="list">${dates.slice(0,historyLimit).map(t=>{const day=state.days[t],ml=day.waterPlan.filter(x=>day.water.includes(x.id)).reduce((sum,x)=>sum+x.ml,0);return `<article class="card daily-record"><div><h3>${thaiDate(t)}</h3><p class="small muted">${day.savedAt?'บันทึกล่าสุด '+savedTime(day.savedAt):'บันทึกเดิม · ไม่ทราบเวลาบันทึก'}</p><div class="daily-summary"><span>น้ำ ${litres(ml)} ลิตร</span><span>กิจกรรมทำแล้ว ${day.schedule.filter(x=>x.status==='done').length}/${day.schedule.length}</span><span>อาหาร ${day.meals.length} รายการ</span><span>ออกกำลัง ${day.workoutDone.length} รายการ</span><span>ดูแล ${day.care.length} รายการ</span></div></div>${btn('เปิดดู / แก้ไข','open-day','soft',`data-date="${t}" aria-label="เปิดดู / แก้ไข ${thaiDate(t)}"`)}</article>`;}).join('')}</div>${dates.length>historyLimit?`<div class="history-more">${btn('ดูวันก่อนหน้าเพิ่มเติม','history-more')}</div>`:''}`:empty('ยังไม่มีบันทึก'+(historyMonth?'ในเดือนนี้':''),'เลือกวันที่ แล้วเพิ่มข้อมูลหรือกด “บันทึกวันที่เลือก” เพื่อเริ่มเก็บประวัติ')}`;
  }
  const btn=(text,action,style='soft',extra='')=>`<button class="btn ${style}" data-action="${action}" ${extra}>${text}</button>`;
  const notice=(text,kind='')=>`<div class="notice ${kind}">${icon('info')}<div>${text}</div></div>`;
@@ -56,11 +70,11 @@
   <section class="card"><h2>ข้อมูลของคุณ</h2><div class="setting-row"><h3>บันทึกเฉพาะอุปกรณ์นี้</h3><p>ข้อมูลอยู่ใน localStorage ของเบราว์เซอร์และที่อยู่เว็บนี้ ไม่มีบัญชีหรือการซิงก์ข้ามเครื่อง เปลี่ยนเบราว์เซอร์/โดเมน หรือใช้โหมดส่วนตัวอาจไม่เห็นข้อมูลเดิม การล้างข้อมูลเว็บไซต์จะลบข้อมูลที่บันทึกไว้</p></div><div class="setting-row"><h3>สำรองและย้ายข้อมูล</h3><p>ส่งออกไฟล์ JSON แล้วนำเข้าในอีกอุปกรณ์ การนำเข้าจะแทนที่ข้อมูลทั้งหมดในเบราว์เซอร์นี้ ควรส่งออกสำรองก่อน</p><div class="actions">${btn(icon('download')+' ส่งออก JSON','export','primary')}${btn('ดาวน์โหลดข้อมูลเดิมที่อ่านไม่ได้','raw-export','soft',storageBlocked&&rawBackup!==null?'':'hidden')}</div></div><div class="setting-row import-area"><label for="importFile"><strong>นำเข้าจากไฟล์ JSON</strong></label><input id="importFile" type="file" accept=".json,application/json"><p>ตรวจรูปแบบก่อนแสดงสรุปให้ยืนยัน ขนาดไม่เกิน 5 MB</p></div><div class="setting-row"><h3>เริ่มข้อมูลใหม่</h3><p>ล้างข้อมูลของแอปนี้แล้วคืนชุดเริ่มต้น จะมีหน้าต่างยืนยันก่อนล้าง</p>${btn('คืนข้อมูลเริ่มต้น','reset','danger')}</div></section></div>`;}
  function render(){
   $('#selectedDate').value=date;$('#pageTitle').textContent=routes[page][1];$('#pageSubtitle').textContent=routes[page][2];$('#breadcrumb').textContent=routes[page][0];$('#eyebrow').textContent=page==='dashboard'?'YOUR EVERYDAY, A LITTLE BETTER':'YOUR DAY / '+page.toUpperCase();
-  $('#navigation').innerHTML=Object.keys(routes).filter(k=>k!=='settings').map(k=>`<button class="nav-item ${k===page?'active':''}" data-page="${k}" ${k===page?'aria-current="page"':''}>${icon(k)}${routes[k][0]}</button>`).join('');
+  $('#navigation').innerHTML=Object.keys(routes).filter(k=>k!=='settings').map(k=>`<button class="nav-item ${k===page?'active':''}" data-page="${k}" ${k===page?'aria-current="page"':''}>${icon(k==='history'?'clock':k)}${routes[k][0]}</button>`).join('');
   $('#settingsNav').innerHTML=icon('settings')+'ตั้งค่า';$('#settingsNav').classList.toggle('active',page==='settings');$('#settingsNav').setAttribute('aria-current',page==='settings'?'page':'false');
-  const html={dashboard,water:waterPage,schedule:schedulePage,workout:workoutPage,meals:mealsPage,care:carePage,settings:settingsPage}[page]();
+  const html={dashboard,water:waterPage,schedule:schedulePage,workout:workoutPage,meals:mealsPage,care:carePage,settings:settingsPage,history:dailyHistory}[page]();
   $('#content').innerHTML=(storageBlocked?`<div class="storage-banner">${notice(e(storageIssue)+' <button class="text-btn" data-page="settings">จัดการ / สำรองข้อมูล</button>','error')}</div>`:'')+html+historySection();
-  if(storageBlocked)$('#saveState').textContent='ยังไม่ได้บันทึกถาวร';
+  $('#dailySave').hidden=page==='settings'||page==='history';updateSaveStatus();
  }
  function historySection(){
   if(page==='care'){
@@ -112,7 +126,7 @@
    if(type==='copy'){if(v('source')===date)throw Error('เลือกวันที่อื่นเพื่อคัดลอก');const source=state.days[v('source')];if(!source?.schedule.length)throw Error('วันที่ต้นทางยังไม่มีตาราง');d().schedule.push(...source.schedule.map(x=>({...x,id:C.uid(),status:'pending'})));d().schedule.sort((a,b)=>(a.time||'00:00').localeCompare(b.time||'00:00'));}
    if(type==='reset'){state=C.createState();storageBlocked=false;storageIssue='';rawBackup=null;}
    if(type==='import'){state=C.clone(editorImport);storageBlocked=false;storageIssue='';rawBackup=null;}
-   C.validate(state);save('บันทึกแล้ว');closeEditor();render();
+   C.validate(state);save('บันทึกแล้ว',type!=='import'&&type!=='reset');closeEditor();render();
   }catch(err){state=previous;$('#formError').textContent=err.message;}
  }
  function deleteCurrent(){if(!editor)return;if(!deleteArmed){deleteArmed=true;$('#deleteItem').textContent='กดอีกครั้งเพื่อยืนยันลบ';return;}const {type,id,group}=editor;
@@ -128,6 +142,10 @@
   if(ev.target.closest('[data-close]')){closeEditor();return;}
   const b=ev.target.closest('[data-action]');if(!b)return;const a=b.dataset.action,id=b.dataset.id;
   const focusKey={action:a,id};let changed=false;
+  if(a==='day-save'){save('บันทึก '+thaiDate(date)+' แล้ว');render();return;}
+  if(a==='open-day'){selectDate(b.dataset.date);navigate('dashboard');return;}
+  if(a==='history-more'){historyLimit+=20;render();return;}
+  if(a==='history-clear'){historyMonth='';historyLimit=20;render();return;}
   if(a==='water-toggle'){d().water=toggle(d().water,id);changed=true;}
   if(a==='care-toggle'){d().care=toggle(d().care,id);changed=true;}
   if(a==='workout-toggle'){d().workoutDone=toggle(d().workoutDone,id);changed=true;}
@@ -138,11 +156,12 @@
   if(a==='care-note'){d().careNote=$('#careNote').value;save('บันทึกข้อความแล้ว');}
   if(a==='export')download(JSON.stringify(state,null,2),'jai-daily-'+localDate()+'.json');
   if(a==='raw-export')download(rawBackup,'jai-daily-original-backup.json');
-  if(a==='reload-data'){try{state=C.parseImport(localStorage.getItem(KEY));storageBlocked=false;render();}catch{toast('ยังอ่านข้อมูลใหม่ไม่ได้');}}
+  if(a==='reload-data'){try{state=C.parseImport(localStorage.getItem(KEY));savedDates=new Set(Object.keys(state.days));storageBlocked=false;render();}catch{toast('ยังอ่านข้อมูลใหม่ไม่ได้');}}
   if(changed){save();render();toast(storageBlocked?'ยังบันทึกในเครื่องไม่ได้ · ส่งออก JSON เพื่อสำรอง':a==='water-toggle'?`บันทึกน้ำ ${litres(stats().ml)} ลิตร · ${stats().count} แก้ว`:'บันทึกสถานะแล้ว');const target=[...document.querySelectorAll('[data-action]')].find(x=>x.dataset.action===focusKey.action&&x.dataset.id===focusKey.id);target?.focus({preventScroll:true});}
  });
  document.addEventListener('input',ev=>{if(ev.target.id==='careNote'){d().careNote=ev.target.value;save();}});
  document.addEventListener('change',async ev=>{
+  if(ev.target.id==='historyMonth'){historyMonth=ev.target.value;historyLimit=20;render();$('#historyMonth').focus();}
   if(ev.target.matches('[data-status-id]')){const id=ev.target.dataset.statusId;d().schedule.find(x=>x.id===id).status=ev.target.value;save('บันทึกสถานะแล้ว');render();[...document.querySelectorAll('[data-status-id]')].find(x=>x.dataset.statusId===id)?.focus({preventScroll:true});}
   if(ev.target.id==='importFile'){
    try{const file=ev.target.files[0];if(!file)return;if(file.size>5000000)throw Error('ไฟล์ใหญ่เกิน 5 MB');editorImport=C.parseImport(await file.text());openEditor('import');}catch(err){toast('นำเข้าไม่ได้: '+err.message);}finally{ev.target.value='';}

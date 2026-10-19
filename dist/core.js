@@ -36,6 +36,7 @@
   for(const k of ['A','B','rest','active']){const w=s.workouts[k];if(!w||!str(w.title,200)||!items(w.exercises,x=>str(x.name,200)&&num(x.sets,100)&&Number.isInteger(x.sets)&&x.sets>0&&str(x.reps,200)&&str(x.note)))fail();}
   if(!items(s.phases,x=>str(x.name,100)&&num(x.minutes,500))||!items(s.care,x=>str(x.title,200)&&['self','pet'].includes(x.category)&&str(x.note))||!s.days||typeof s.days!=='object'||Array.isArray(s.days)||Object.keys(s.days).length>10000)fail();
   for(const [date,d] of Object.entries(s.days)){
+   if(d?.savedAt!==undefined&&(typeof d.savedAt!=='string'||!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(d.savedAt)||!Number.isFinite(Date.parse(d.savedAt))))fail();
    if(d?.careArchive!==undefined&&!items(d.careArchive,x=>str(x.title,200)&&['self','pet'].includes(x.category)&&str(x.note)))fail();
    if(d?.workoutArchive!==undefined&&!items(d.workoutArchive,x=>str(x.name,200)&&num(x.sets,100)&&Number.isInteger(x.sets)&&x.sets>0&&str(x.reps,200)&&str(x.note)&&['A','B','rest','active'].includes(x.group)))fail();
    if(!validDate(date)||!d||!waterOK(d.waterPlan)||!ids(d.water)||d.water.some(id=>!d.waterPlan.some(w=>w.id===id))||!ids(d.workoutDone)||!ids(d.care)||!str(d.careNote)||!items(d.schedule,x=>(x.time===''||time(x.time))&&str(x.title,200)&&Object.hasOwn(statuses,x.status)&&str(x.note))||!items(d.meals,x=>str(x.name,200)&&str(x.meal,100)&&typeof x.estimated==='boolean'&&str(x.note)&&['kcal','protein','carbs','fat','fiber','sodium'].every(k=>x[k]===null||num(x[k]))))fail();
