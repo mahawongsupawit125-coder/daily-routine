@@ -33,3 +33,7 @@ test('optional historical definitions roundtrip and reject malformed archives',(
  const s=C.createState(),d=C.day(s,'2026-10-19');d.careArchive=[{...s.care[0]}];d.workoutArchive=[{...s.workouts.A.exercises[0],id:'A-e0',group:'A'}];assert.deepEqual(C.parseImport(JSON.stringify(s)),s);
  d.careArchive[0].title={bad:true};assert.throws(()=>C.parseImport(JSON.stringify(s)));d.careArchive=[];d.workoutArchive[0].group='invalid';assert.throws(()=>C.parseImport(JSON.stringify(s)));
 });
+test('meal eaten time portion and photo analysis source preserve old backups and validate new fields',()=>{
+ const s=C.createState(),m=s.days['2026-10-19'].meals[0];assert.doesNotThrow(()=>C.validate(s));m.time='13:45';m.portion='ครึ่งจาน';m.source='photo-ai';assert.deepEqual(C.parseImport(JSON.stringify(s)),s);
+ m.time='25:61';assert.throws(()=>C.validate(s));m.time='';m.portion='x'.repeat(201);assert.throws(()=>C.validate(s));m.portion='1 จาน';m.source='untrusted';assert.throws(()=>C.validate(s));
+});

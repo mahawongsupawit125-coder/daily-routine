@@ -21,3 +21,4 @@ test('source files and Git metadata are not exposed by local server',async()=>{
 test('encoded path traversal is denied',async()=>{assert.equal((await fetch(base+'/%2e%2e%2fserver.cjs')).status,403);});
 test('malformed path and write methods are rejected',async()=>{assert.equal((await fetch(base+'/%zz')).status,400);assert.equal((await fetch(base+'/',{method:'POST',body:'test'})).status,405);});
 test('HEAD returns headers without a body',async()=>{const r=await fetch(base+'/',{method:'HEAD'});assert.equal(r.status,200);assert.equal(await r.text(),'');});
+test('local AI endpoint is real but remains disabled until server secrets are configured',async()=>{const r=await fetch(base+'/api/analyze-food',{method:'POST',headers:{'Content-Type':'application/json',Origin:base},body:'{}'});assert.equal(r.status,503);assert.match((await r.json()).error,/ยังไม่เปิดบริการ/);assert.equal(r.headers.get('cache-control'),'no-store');});

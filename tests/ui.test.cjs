@@ -18,6 +18,7 @@ function setup(t,{width=1440,raw=null,blocked=false}={}){
  if(raw!==null)w.localStorage.setItem(KEY,raw);
  if(blocked)w.Storage.prototype.setItem=function(){throw Error('QuotaExceededError');};
  w.eval(fs.readFileSync(path.join(__dirname,'../dist/core.js'),'utf8'));
+ w.eval(fs.readFileSync(path.join(__dirname,'../dist/food-photo.js'),'utf8'));
  w.eval(fs.readFileSync(path.join(__dirname,'../dist/app.js'),'utf8'));
  t.after(()=>{assert.deepEqual(errors,[]);dom.window.close();});
  const q=s=>doc.querySelector(s),all=s=>[...doc.querySelectorAll(s)];
@@ -161,4 +162,38 @@ test('daily save failure never marks the day as saved or adds it to history',t=>
 test('history pages records in batches without losing older days',t=>{
  const s=C.createState();for(let i=1;i<=31;i++)C.day(s,'2026-10-'+String(i).padStart(2,'0'));
  const a=setup(t,{raw:JSON.stringify(s)});a.page('history');assert.equal(a.all('[data-action="open-day"]').length,20);a.click('[data-action="history-more"]');assert.equal(a.all('[data-action="open-day"]').length,31);
+});
+function configureFood(a){a.page('settings');a.q('[name="foodEndpoint"]').value='https://food.example/api/analyze-food';a.q('[name="foodAccessCode"]').value='b'.repeat(32);a.q('#foodApiForm').requestSubmit();a.page('meals');}
+async function photo(a){
+ a.w.Image=class{naturalWidth=1000;naturalHeight=800;set src(v){if(v)queueMicrotask(()=>this.onload());}};
+ a.w.HTMLCanvasElement.prototype.getContext=()=>({fillRect(){},drawImage(){}});a.w.HTMLCanvasElement.prototype.toDataURL=()=> 'data:image/jpeg;base64,/9j/2Q==';
+ const input=a.q('#foodFile');Object.defineProperty(input,'files',{value:[{type:'image/jpeg',size:20000}],configurable:true});input.dispatchEvent(new a.w.Event('change',{bubbles:true}));await new Promise(r=>setImmediate(r));
+}
+test('photo flow works without AI through manual review and saves meal time/portion by date',t=>{
+ const a=setup(t);a.date('2026-10-20');a.page('meals');a.click('[data-food-action="open"]');assert.equal(a.q('#foodPhotoDialog').open,true);assert.equal(a.q('#foodCamera').getAttribute('capture'),'environment');assert.equal(a.q('#foodAnalyze').disabled,true);
+ a.q('#foodDate').value='2026-10-21';a.q('#foodTime').value='13:25';a.q('#foodMeal').value='กลางวัน';a.q('#foodPortion').value='1 จาน';a.q('#foodDescription').value='ข้าวทดสอบ';a.click('[data-food-action="manual"]');assert.equal(a.w.localStorage.getItem(KEY),null);assert.equal(a.q('#editor').open,true);a.submit();
+ const m=a.stored().days['2026-10-21'].meals[0];assert.equal(m.name,'ข้าวทดสอบ');assert.equal(m.time,'13:25');assert.equal(m.portion,'1 จาน');assert.equal(m.kcal,null);assert.equal(m.source,'manual');assert.match(a.q('#content').textContent,/13:25/);
+});
+test('AI photo consent gates network and reviewed result alone is saved to the chosen day',async t=>{
+ const a=setup(t);configureFood(a);a.date('2026-10-20');a.click('[data-food-action="open"]');await photo(a);let calls=0;
+ a.w.fetch=async(url,options)=>{calls++;assert.equal(url,'https://food.example/api/analyze-food');assert.match(options.headers.Authorization,/^Bearer b/);return {ok:true,json:async()=>({analysis:{isFood:true,foodName:'ข้าวจากรูป',portion:'1 จาน',kcal:500,protein:20.17,carbs:65,fat:18,fiber:null,sodium:null,confidence:'low',note:'ไม่ทราบน้ำมัน'}})};};
+ a.click('#foodAnalyze');await new Promise(r=>setImmediate(r));assert.equal(calls,0);assert.match(a.q('#foodPhotoStatus').textContent,/ยืนยัน/);
+ a.q('#foodDate').value='2026-10-22';a.q('#foodTime').value='18:45';a.q('#foodMeal').value='เย็น';a.q('#foodConsent').checked=true;a.click('#foodAnalyze');await new Promise(r=>setImmediate(r));assert.equal(calls,1);assert.equal(a.w.localStorage.getItem(KEY),null);assert.equal(a.q('#editor').open,true);
+ assert.equal(a.q('#editorForm [name="protein"]').value,'20.2');assert.equal(a.q('#editorForm').checkValidity(),true);a.values({kcal:480});a.submit();const m=a.stored().days['2026-10-22'].meals[0];assert.equal(m.kcal,480);assert.equal(m.time,'18:45');assert.equal(m.source,'photo-ai');assert.equal(m.estimated,true);assert.equal(m.sodium,null);assert.doesNotMatch(JSON.stringify(a.stored()),/Bearer|bbbbbbbb|image\/jpeg/);
+ a.click(`[data-action="meal-edit"][data-id="${m.id}"]`);a.values({time:'19:00'});a.submit();assert.equal(a.stored().days['2026-10-22'].meals[0].source,'photo-ai');
+});
+test('closing a pending photo analysis ignores late results and saves nothing',async t=>{
+ const a=setup(t);configureFood(a);a.click('[data-food-action="open"]');await photo(a);a.q('#foodConsent').checked=true;let release,signal;
+ a.w.fetch=async(u,o)=>{signal=o.signal;return new Promise(r=>{release=r;});};a.click('#foodAnalyze');a.click('[data-food-action="cancel"]');assert.equal(signal.aborted,true);
+ release({ok:true,json:async()=>({analysis:{}})});await new Promise(r=>setImmediate(r));assert.equal(a.q('#editor').open,false);assert.equal(a.w.localStorage.getItem(KEY),null);
+});
+test('cancel during response JSON download cannot reopen review or close a newer photo dialog',async t=>{
+ const a=setup(t);configureFood(a);a.click('[data-food-action="open"]');await photo(a);a.q('#foodConsent').checked=true;let release;
+ a.w.fetch=async()=>({ok:true,json:()=>new Promise(r=>{release=r;})});a.click('#foodAnalyze');await new Promise(r=>setImmediate(r));a.click('[data-food-action="cancel"]');a.click('[data-food-action="open"]');
+ release({analysis:{isFood:true,foodName:'ผลเก่า',portion:'1 จาน',kcal:500,protein:20,carbs:60,fat:20,fiber:null,sodium:null,confidence:'low',note:'ผลที่มาช้า'}});await new Promise(r=>setImmediate(r));assert.equal(a.q('#editor').open,false);assert.equal(a.q('#foodPhotoDialog').open,true);assert.equal(a.w.localStorage.getItem(KEY),null);
+});
+test('AI access code is memory only and invalid endpoint or API key is rejected',t=>{
+ const a=setup(t);configureFood(a);assert.doesNotMatch([...Array(a.w.localStorage.length)].map((_,i)=>a.w.localStorage.getItem(a.w.localStorage.key(i))).join(''),/bbbbbbbb/);
+ a.page('settings');a.q('[name="foodEndpoint"]').value='https://user:pass@food.example/api/analyze-food';a.q('#foodApiForm').requestSubmit();assert.match(a.q('#foodApiStatus').textContent,/HTTPS/);
+ a.q('[name="foodEndpoint"]').value='https://food.example/api/analyze-food';a.q('[name="foodAccessCode"]').value='sk-should-not-go-to-browser';a.q('#foodApiForm').requestSubmit();assert.match(a.q('#foodApiStatus').textContent,/ไม่ใช้ API key/);
 });
