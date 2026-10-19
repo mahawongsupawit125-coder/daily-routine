@@ -1,0 +1,13 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "your-day-food-ai",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-10-19",
+  "workers_dev": true,
+  "observability": { "enabled": false },
+  "vars": {
+    "FOOD_ALLOWED_ORIGINS": "https://mahawongsupawit125-coder.github.io",
+    "OPENAI_MODEL": "gpt-4.1-mini"
+  },
+  "ratelimits": [{ "name": "FOOD_RATE_LIMIT", "namespace_id": "1001", "simple": { "limit": 6, "period": 60 } }]
+}
