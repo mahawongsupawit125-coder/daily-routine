@@ -132,3 +132,33 @@ test('deleting exercise template preserves its completed log and title on old da
 test('existing empty storage is treated as corrupt rather than absent',t=>{
  const a=setup(t,{raw:''});assert.match(a.q('#content').textContent,/ยังไม่ถูกเขียนทับ/);a.page('water');a.click('[data-action="water-toggle"][data-id="w0"]');assert.equal(a.w.localStorage.getItem(KEY),'');
 });
+test('explicit daily save persists an empty day and opens it from history after reload',t=>{
+ const a=setup(t);a.date('2026-10-21');assert.match(a.q('#dailySaveStatus').textContent,/ยังไม่มีบันทึก/);
+ a.click('[data-action="day-save"]');const raw=JSON.stringify(a.stored());
+ assert.ok(a.stored().days['2026-10-21'].savedAt);assert.match(a.q('#dailySaveStatus').textContent,/บันทึกล่าสุด/);
+ const b=setup(t,{raw});b.page('history');b.click('[data-action="open-day"][data-date="2026-10-21"]');
+ assert.equal(b.q('#selectedDate').value,'2026-10-21');assert.equal(b.q('#breadcrumb').textContent,'ภาพรวม');assert.match(b.q('#dailySaveStatus').textContent,/บันทึกล่าสุด/);
+});
+test('daily history restores all daily records independently and filters by month',t=>{
+ const a=setup(t);a.date('2026-10-20');a.page('water');a.click('[data-action="water-toggle"][data-id="w0"]');
+ a.page('schedule');a.click('[data-action="schedule-add"]');a.values({title:'อ่านหนังสือ',time:'13:00',status:'done'});a.submit();
+ a.page('meals');a.click('[data-action="meal-add"]');a.values({name:'มื้อทดสอบ',meal:'กลางวัน',kcal:200});a.submit();
+ a.page('workout');a.click('[data-action="workout-toggle"][data-id="B-e0"]');a.page('care');a.click('[data-action="care-toggle"][data-id="c5"]');
+ a.q('#careNote').value='น้ำใหม่แล้ว';a.q('#careNote').dispatchEvent(new a.w.Event('input',{bubbles:true}));
+ a.date('2026-11-01');a.click('[data-action="day-save"]');const b=setup(t,{raw:JSON.stringify(a.stored())});b.page('history');
+ assert.ok(b.q('[data-action="open-day"][data-date="2026-10-20"]'));b.change('#historyMonth','2026-11');assert.equal(b.q('[data-action="open-day"][data-date="2026-10-20"]'),null);
+ b.change('#historyMonth','');b.click('[data-action="open-day"][data-date="2026-10-20"]');b.page('water');assert.match(b.q('.ring-number').textContent,/0.3/);
+ assert.deepEqual(b.stored().days['2026-10-20'].care,['c5']);assert.equal(b.stored().days['2026-10-20'].careNote,'น้ำใหม่แล้ว');assert.equal(b.stored().days['2026-10-20'].schedule[0].status,'done');assert.equal(b.stored().days['2026-10-20'].meals[0].kcal,200);assert.deepEqual(b.stored().days['2026-10-20'].workoutDone,['B-e0']);
+ b.date('2026-11-01');assert.match(b.q('.ring-number').textContent,/0.0/);
+});
+test('visiting dates does not claim saved history and legacy records still open',t=>{
+ const a=setup(t);a.date('2026-10-29');a.page('history');assert.equal(a.all('[data-action="open-day"]').length,0);
+ const b=setup(t,{raw:JSON.stringify(C.createState())});b.page('history');assert.match(b.q('#content').textContent,/ไม่ทราบเวลาบันทึก/);b.click('[data-action="open-day"][data-date="2026-10-19"]');assert.match(b.q('#dailySaveStatus').textContent,/บันทึกเดิม/);
+});
+test('daily save failure never marks the day as saved or adds it to history',t=>{
+ const a=setup(t,{blocked:true});a.date('2026-10-21');a.click('[data-action="day-save"]');assert.match(a.q('#dailySaveStatus').textContent,/ยังไม่ได้บันทึกถาวร/);assert.equal(a.w.localStorage.getItem(KEY),null);a.page('history');assert.equal(a.all('[data-action="open-day"]').length,0);
+});
+test('history pages records in batches without losing older days',t=>{
+ const s=C.createState();for(let i=1;i<=31;i++)C.day(s,'2026-10-'+String(i).padStart(2,'0'));
+ const a=setup(t,{raw:JSON.stringify(s)});a.page('history');assert.equal(a.all('[data-action="open-day"]').length,20);a.click('[data-action="history-more"]');assert.equal(a.all('[data-action="open-day"]').length,31);
+});
