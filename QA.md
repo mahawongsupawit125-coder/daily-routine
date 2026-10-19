@@ -2,9 +2,11 @@
 
 วันที่: 19 ตุลาคม 2026
 
-ผลล่าสุด: `npm run check` และ `npm test` ใช้ตรวจ **56 ข้อ** (core 9, DOM 30, photo helpers 3, API handler 7, local server 7) บน Node 24 รายละเอียดผลรอบเผยแพร่บันทึกใน commit/CI
+ผลล่าสุด: `npm run check` และ `npm test` ใช้ตรวจ **62 ข้อ** (core 13, DOM 32, photo helpers 3, API handler 7, local server 7) บน Node 24 รายละเอียดผลรอบเผยแพร่บันทึกใน commit/CI
 
 ## ตรวจแล้ว
+
+- ถอดหมวดดูแลเดิมออกจาก UI/seed; ปรับข้อมูลรุ่นเก่าและไฟล์นำเข้าโดยเก็บข้อมูลน้ำ อาหาร ตาราง และการดูแลตัวเอง; บันทึกผลปรับเมื่อโหลดและแสดงข้อผิดพลาดหากเขียนลงเครื่องไม่ได้; ทดสอบปรับซ้ำแล้วข้อมูลไม่เปลี่ยน
 
 - Photo flow: กล้อง/เลือกไฟล์, preview compression ผ่านตัวจำลอง, consent ก่อนส่ง, ตรวจแก้ผลก่อนเพิ่มมื้อ, เลือกวัน/มื้อ/เวลาจริง, ยกเลิกคำขอแล้วผลที่มาช้าไม่เพิ่มข้อมูล, รหัสเข้าใช้ไม่อยู่ใน localStorage/JSON
 - API: ปิดเมื่อไม่มี secrets, exact origin allowlist, token, rate limit, ขนาดและรูปแบบคำขอ, structured response, null ไม่เป็นศูนย์, nonfood/refusal/timeout/upstream errors; ใช้ provider จำลอง ไม่มีค่าใช้จ่ายหรือการเรียก OpenAI จริง
