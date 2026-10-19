@@ -37,3 +37,23 @@ test('meal eaten time portion and photo analysis source preserve old backups and
  const s=C.createState(),m=s.days['2026-10-19'].meals[0];assert.doesNotThrow(()=>C.validate(s));m.time='13:45';m.portion='ครึ่งจาน';m.source='photo-ai';assert.deepEqual(C.parseImport(JSON.stringify(s)),s);
  m.time='25:61';assert.throws(()=>C.validate(s));m.time='';m.portion='x'.repeat(201);assert.throws(()=>C.validate(s));m.portion='1 จาน';m.source='untrusted';assert.throws(()=>C.validate(s));
 });
+function legacyAnimalState(){
+ const s=C.createState(),d=C.day(s,'2026-10-20');s.care.push({id:'c5',category:'pet',title:'ตรวจน้ำกระแต',note:'กระต่าย Lionhead'},{id:'old-pet',category:'pet',title:'ตรวจคอก',note:'เก่า'});
+ d.water=['w0'];d.care=['c0','c5','old-pet','archived-pet'];d.careNote='ทาครีมแล้ว\nให้อาหารกระแต\nอ่านหนังสือแล้ว';d.careArchive=[{id:'archived-pet',category:'pet',title:'ตรวจอาหาร',note:'เก่า'},{id:'archived-self',category:'self',title:'ดูแลผิว',note:'เก็บไว้'}];
+ d.schedule=[{id:'self-task',time:'12:00',title:'อาบน้ำ',status:'done',note:'ดูแลตัวเอง'},{id:'animal-task',time:'13:00',title:'ให้อาหารกระต่าย',status:'done',note:''}];
+ s.workouts.active.exercises=[{id:'old-active',name:'ตกเบ็ด / ว่ายน้ำสบาย ๆ / พากระแตเดินสวน',sets:1,reps:'ตามสบาย',note:''},{id:'rabbit-only',name:'ดูแลกระต่าย',sets:1,reps:'',note:''}];d.workoutDone=['active-old-active','active-rabbit-only'];
+ return s;
+}
+test('new app starts with self care only and no animal content',()=>{
+ const s=C.createState();assert.ok(s.care.every(x=>x.category==='self'));assert.doesNotMatch(JSON.stringify(s),/กระแต|กระต่าย|Lionhead|rabbit|"pet"/i);
+});
+test('old backups remove animal templates logs notes and tasks while preserving other daily data',()=>{
+ const old=legacyAnimalState(),s=C.parseImport(JSON.stringify(old)),d=s.days['2026-10-20'];assert.deepEqual(d.water,['w0']);assert.deepEqual(d.care,['c0']);assert.equal(d.careNote,'ทาครีมแล้ว\nอ่านหนังสือแล้ว');assert.equal(d.schedule.length,1);assert.equal(d.schedule[0].title,'อาบน้ำ');assert.equal(d.careArchive[0].title,'ดูแลผิว');assert.deepEqual(d.workoutDone,['active-old-active']);assert.match(s.workouts.active.exercises[0].name,/ตกเบ็ด/);assert.doesNotMatch(JSON.stringify(s),/กระแต|กระต่าย|Lionhead|rabbit|"pet"/i);assert.deepEqual(C.parseImport(JSON.stringify(s)),s);assert.equal(s.days['2026-10-19'].meals.length,3);
+});
+test('mixed self-care and schedule records retain personal content time and completion',()=>{
+ const s=C.createState(),d=C.day(s,'2026-10-20');s.care[0].note='ทาครีมและให้อาหารกระต่าย';d.care=['c0'];d.schedule=[{id:'mixed',time:'12:30',title:'อาบน้ำ / ให้อาหารกระต่าย',status:'done',note:'ใช้ครีม · ตรวจคอกกระแต'}];
+ const clean=C.parseImport(JSON.stringify(s));assert.equal(clean.care[0].id,'c0');assert.equal(clean.care[0].note,'ทาครีม');assert.deepEqual(clean.days['2026-10-20'].care,['c0']);assert.deepEqual(clean.days['2026-10-20'].schedule,[{id:'mixed',time:'12:30',title:'อาบน้ำ',status:'done',note:'ใช้ครีม'}]);
+});
+test('cleanup never expands bounded fields or invalidates a valid legacy backup',()=>{
+ const s=C.createState();s.workouts.active.exercises[0].name='a;'.repeat(90)+'rabbit';assert.ok(s.workouts.active.exercises[0].name.length<200);const clean=C.parseImport(JSON.stringify(s));assert.ok(clean.workouts.active.exercises[0].name.length<=200);assert.doesNotMatch(clean.workouts.active.exercises[0].name,/rabbit/);assert.equal(clean.days['2026-10-19'].meals.length,3);assert.doesNotThrow(()=>C.validate(clean));
+});

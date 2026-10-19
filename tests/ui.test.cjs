@@ -79,10 +79,10 @@ test('workout plan, phases, exercise CRUD and daily completion',t=>{
 });
 test('care CRUD, note and check marks persist per day',t=>{
  const a=setup(t);a.date('2026-10-20');a.page('care');assert.match(a.q('#content').textContent,/ยังไม่ยืนยันใช้จริง/);
- a.click('[data-action="care-toggle"][data-id="c5"]');a.q('#careNote').value='อุณหภูมิที่วัด 25°C';a.click('[data-action="care-note"]');assert.match(a.stored().days['2026-10-20'].careNote,/25/);
- a.click('[data-action="care-add"][data-category="pet"]');a.values({title:'ตรวจคอก',note:'ทดสอบ'});a.submit();const id=a.stored().care.at(-1).id;assert.equal(a.stored().care.at(-1).category,'pet');
- a.click(`[data-action="care-edit"][data-id="${id}"]`);a.values({title:'ตรวจคอกแล้ว'});a.submit();assert.match(a.q('#content').textContent,/ตรวจคอกแล้ว/);
- a.click(`[data-action="care-edit"][data-id="${id}"]`);a.click('#deleteItem');a.click('#deleteItem');a.date('2026-10-21');assert.equal(a.q('[data-id="c5"]').getAttribute('aria-pressed'),'false');
+ a.click('[data-action="care-toggle"][data-id="c4"]');a.q('#careNote').value='อุณหภูมิที่วัด 25°C';a.click('[data-action="care-note"]');assert.match(a.stored().days['2026-10-20'].careNote,/25/);
+ a.click('[data-action="care-add"]');a.values({title:'ดูแลผิว',note:'ทดสอบ'});a.submit();const id=a.stored().care.at(-1).id;assert.equal(a.stored().care.at(-1).category,'self');
+ a.click(`[data-action="care-edit"][data-id="${id}"]`);a.values({title:'ดูแลผิวแล้ว'});a.submit();assert.match(a.q('#content').textContent,/ดูแลผิวแล้ว/);
+ a.click(`[data-action="care-edit"][data-id="${id}"]`);a.click('#deleteItem');a.click('#deleteItem');a.date('2026-10-21');assert.equal(a.q('[data-id="c4"]').getAttribute('aria-pressed'),'false');
 });
 test('settings save, disable water reference and export JSON',t=>{
  const a=setup(t);a.page('settings');a.q('[name="name"]').value='ทดสอบ';a.q('[name="waterReference"]').value='0';a.q('#settingsForm').requestSubmit();assert.equal(a.stored().settings.waterReference,0);
@@ -119,12 +119,12 @@ test('validation failure rolls back edits so later saves remain valid',t=>{
  const a=setup(t,{raw:JSON.stringify(s)});a.date('2026-10-20');a.page('schedule');a.click('[data-action="schedule-add"]');a.values({title:'รายการเกินขีดจำกัด'});a.submit();assert.equal(a.q('#editor').open,true);a.click('[data-close]');a.page('water');a.click('[data-action="water-toggle"][data-id="w0"]');assert.doesNotThrow(()=>C.parseImport(a.w.localStorage.getItem(KEY)));
 });
 test('care notes typed before a checklist toggle survive the rerender and reload',t=>{
- const a=setup(t);a.date('2026-10-20');a.page('care');a.q('#careNote').value='ร่างที่กำลังพิมพ์';a.q('#careNote').dispatchEvent(new a.w.Event('input',{bubbles:true}));a.click('[data-action="care-toggle"][data-id="c5"]');assert.equal(a.q('#careNote').value,'ร่างที่กำลังพิมพ์');
+ const a=setup(t);a.date('2026-10-20');a.page('care');a.q('#careNote').value='ร่างที่กำลังพิมพ์';a.q('#careNote').dispatchEvent(new a.w.Event('input',{bubbles:true}));a.click('[data-action="care-toggle"][data-id="c4"]');assert.equal(a.q('#careNote').value,'ร่างที่กำลังพิมพ์');
  const b=setup(t,{raw:JSON.stringify(a.stored())});b.date('2026-10-20');b.page('care');assert.equal(b.q('#careNote').value,'ร่างที่กำลังพิมพ์');
 });
 test('deleting care template preserves completed history with its title on that date',t=>{
- const a=setup(t);a.date('2026-10-19');a.page('care');a.click('[data-action="care-toggle"][data-id="c5"]');a.date('2026-10-20');a.click('[data-action="care-edit"][data-id="c5"]');a.click('#deleteItem');a.click('#deleteItem');
- assert.equal(a.stored().care.some(x=>x.id==='c5'),false);assert.ok(a.stored().days['2026-10-19'].care.includes('c5'));a.date('2026-10-19');assert.match(a.q('#content').textContent,/ตรวจน้ำสะอาดของกระแต/);assert.match(a.q('#content').textContent,/ประวัติ/);assert.doesNotThrow(()=>C.parseImport(JSON.stringify(a.stored())));a.click('[data-action="care-toggle"][data-id="c5"]');assert.equal(a.q('[data-id="c5"]').getAttribute('aria-pressed'),'false');a.click('[data-action="care-toggle"][data-id="c5"]');assert.equal(a.q('[data-id="c5"]').getAttribute('aria-pressed'),'true');
+ const a=setup(t);a.date('2026-10-19');a.page('care');a.click('[data-action="care-toggle"][data-id="c4"]');a.date('2026-10-20');a.click('[data-action="care-edit"][data-id="c4"]');a.click('#deleteItem');a.click('#deleteItem');
+ assert.equal(a.stored().care.some(x=>x.id==='c4'),false);assert.ok(a.stored().days['2026-10-19'].care.includes('c4'));a.date('2026-10-19');assert.match(a.q('#content').textContent,/ดูแลเพลทจัดฟัน/);assert.match(a.q('#content').textContent,/ประวัติ/);assert.doesNotThrow(()=>C.parseImport(JSON.stringify(a.stored())));a.click('[data-action="care-toggle"][data-id="c4"]');assert.equal(a.q('[data-id="c4"]').getAttribute('aria-pressed'),'false');a.click('[data-action="care-toggle"][data-id="c4"]');assert.equal(a.q('[data-id="c4"]').getAttribute('aria-pressed'),'true');
 });
 test('deleting exercise template preserves its completed log and title on old dates',t=>{
  const a=setup(t);a.date('2026-10-19');a.page('workout');a.click('[data-action="workout-toggle"][data-id="A-e0"]');a.date('2026-10-22');a.click('[data-action="exercise-edit"][data-id="e0"]');a.click('#deleteItem');a.click('#deleteItem');
@@ -144,12 +144,12 @@ test('daily history restores all daily records independently and filters by mont
  const a=setup(t);a.date('2026-10-20');a.page('water');a.click('[data-action="water-toggle"][data-id="w0"]');
  a.page('schedule');a.click('[data-action="schedule-add"]');a.values({title:'อ่านหนังสือ',time:'13:00',status:'done'});a.submit();
  a.page('meals');a.click('[data-action="meal-add"]');a.values({name:'มื้อทดสอบ',meal:'กลางวัน',kcal:200});a.submit();
- a.page('workout');a.click('[data-action="workout-toggle"][data-id="B-e0"]');a.page('care');a.click('[data-action="care-toggle"][data-id="c5"]');
+ a.page('workout');a.click('[data-action="workout-toggle"][data-id="B-e0"]');a.page('care');a.click('[data-action="care-toggle"][data-id="c4"]');
  a.q('#careNote').value='น้ำใหม่แล้ว';a.q('#careNote').dispatchEvent(new a.w.Event('input',{bubbles:true}));
  a.date('2026-11-01');a.click('[data-action="day-save"]');const b=setup(t,{raw:JSON.stringify(a.stored())});b.page('history');
  assert.ok(b.q('[data-action="open-day"][data-date="2026-10-20"]'));b.change('#historyMonth','2026-11');assert.equal(b.q('[data-action="open-day"][data-date="2026-10-20"]'),null);
  b.change('#historyMonth','');b.click('[data-action="open-day"][data-date="2026-10-20"]');b.page('water');assert.match(b.q('.ring-number').textContent,/0.3/);
- assert.deepEqual(b.stored().days['2026-10-20'].care,['c5']);assert.equal(b.stored().days['2026-10-20'].careNote,'น้ำใหม่แล้ว');assert.equal(b.stored().days['2026-10-20'].schedule[0].status,'done');assert.equal(b.stored().days['2026-10-20'].meals[0].kcal,200);assert.deepEqual(b.stored().days['2026-10-20'].workoutDone,['B-e0']);
+ assert.deepEqual(b.stored().days['2026-10-20'].care,['c4']);assert.equal(b.stored().days['2026-10-20'].careNote,'น้ำใหม่แล้ว');assert.equal(b.stored().days['2026-10-20'].schedule[0].status,'done');assert.equal(b.stored().days['2026-10-20'].meals[0].kcal,200);assert.deepEqual(b.stored().days['2026-10-20'].workoutDone,['B-e0']);
  b.date('2026-11-01');assert.match(b.q('.ring-number').textContent,/0.0/);
 });
 test('visiting dates does not claim saved history and legacy records still open',t=>{
@@ -196,4 +196,14 @@ test('AI access code is memory only and invalid endpoint or API key is rejected'
  const a=setup(t);configureFood(a);assert.doesNotMatch([...Array(a.w.localStorage.length)].map((_,i)=>a.w.localStorage.getItem(a.w.localStorage.key(i))).join(''),/bbbbbbbb/);
  a.page('settings');a.q('[name="foodEndpoint"]').value='https://user:pass@food.example/api/analyze-food';a.q('#foodApiForm').requestSubmit();assert.match(a.q('#foodApiStatus').textContent,/HTTPS/);
  a.q('[name="foodEndpoint"]').value='https://food.example/api/analyze-food';a.q('[name="foodAccessCode"]').value='sk-should-not-go-to-browser';a.q('#foodApiForm').requestSubmit();assert.match(a.q('#foodApiStatus').textContent,/ไม่ใช้ API key/);
+});
+test('legacy animal data is cleaned and persisted on load without erasing other days',t=>{
+ const s=C.createState(),day=C.day(s,'2026-10-20');s.care.push({id:'old-rabbit',category:'pet',title:'ดูแลกระแต',note:'กระต่าย'});day.care=['c0','old-rabbit'];day.water=['w0'];day.careNote='ทาครีมแล้ว\nให้อาหารกระต่าย';
+ const a=setup(t,{raw:JSON.stringify(s)});assert.doesNotMatch(JSON.stringify(a.stored()),/กระต่าย|กระแต|"pet"/);assert.deepEqual(a.stored().days['2026-10-20'].water,['w0']);assert.deepEqual(a.stored().days['2026-10-20'].care,['c0']);
+ for(const p of ['dashboard','care','workout']){a.page(p);assert.doesNotMatch(a.q('#main').textContent,/กระแต|กระต่าย|Lionhead/);}
+ a.page('care');a.click('[data-action="care-add"]');assert.equal(a.q('#editorForm [name="category"]'),null);
+});
+test('failed cleanup write preserves unrelated in-memory records and reports unsaved storage',t=>{
+ const s=C.createState(),d=C.day(s,'2026-10-20');s.care.push({id:'retired',category:'pet',title:'ดูแลกระต่าย',note:''});d.water=['w0'];d.care=['retired','c0'];
+ const raw=JSON.stringify(s),a=setup(t,{raw,blocked:true});assert.equal(a.w.localStorage.getItem(KEY),raw);a.date('2026-10-20');a.page('water');assert.match(a.q('.ring-number').textContent,/0.3/);assert.match(a.q('#saveState').textContent,/ยังไม่ได้บันทึกถาวร/);a.page('care');assert.doesNotMatch(a.q('#content').textContent,/กระต่าย|กระแต/);assert.ok(a.q('[data-action="care-toggle"][data-id="c0"]'));
 });
