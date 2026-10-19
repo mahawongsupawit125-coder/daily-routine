@@ -32,6 +32,7 @@
   const items=(a,fn)=>arr(a,x=>x&&str(x.id,100)&&x.id.length>0&&fn(x))&&new Set(a.map(x=>x.id)).size===a.length;
   const ids=a=>arr(a,x=>str(x,100))&&new Set(a).size===a.length;
   const waterOK=a=>items(a,x=>time(x.time)&&num(x.ml,10000)&&x.ml>0);
+  const mealDetails=x=>(x.time===undefined||x.time===''||time(x.time))&&(x.portion===undefined||str(x.portion,200))&&(x.source===undefined||['manual','photo-ai'].includes(x.source));
   if(!s||s.version!==1||!s.settings||!str(s.settings.name,80)||!num(s.settings.waterReference,20000)||!waterOK(s.water)||!s.workouts||!arr(s.week,x=>['A','B','rest','active'].includes(x),7)||s.week.length!==7)fail();
   for(const k of ['A','B','rest','active']){const w=s.workouts[k];if(!w||!str(w.title,200)||!items(w.exercises,x=>str(x.name,200)&&num(x.sets,100)&&Number.isInteger(x.sets)&&x.sets>0&&str(x.reps,200)&&str(x.note)))fail();}
   if(!items(s.phases,x=>str(x.name,100)&&num(x.minutes,500))||!items(s.care,x=>str(x.title,200)&&['self','pet'].includes(x.category)&&str(x.note))||!s.days||typeof s.days!=='object'||Array.isArray(s.days)||Object.keys(s.days).length>10000)fail();
@@ -39,7 +40,7 @@
    if(d?.savedAt!==undefined&&(typeof d.savedAt!=='string'||!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(d.savedAt)||!Number.isFinite(Date.parse(d.savedAt))))fail();
    if(d?.careArchive!==undefined&&!items(d.careArchive,x=>str(x.title,200)&&['self','pet'].includes(x.category)&&str(x.note)))fail();
    if(d?.workoutArchive!==undefined&&!items(d.workoutArchive,x=>str(x.name,200)&&num(x.sets,100)&&Number.isInteger(x.sets)&&x.sets>0&&str(x.reps,200)&&str(x.note)&&['A','B','rest','active'].includes(x.group)))fail();
-   if(!validDate(date)||!d||!waterOK(d.waterPlan)||!ids(d.water)||d.water.some(id=>!d.waterPlan.some(w=>w.id===id))||!ids(d.workoutDone)||!ids(d.care)||!str(d.careNote)||!items(d.schedule,x=>(x.time===''||time(x.time))&&str(x.title,200)&&Object.hasOwn(statuses,x.status)&&str(x.note))||!items(d.meals,x=>str(x.name,200)&&str(x.meal,100)&&typeof x.estimated==='boolean'&&str(x.note)&&['kcal','protein','carbs','fat','fiber','sodium'].every(k=>x[k]===null||num(x[k]))))fail();
+   if(!validDate(date)||!d||!waterOK(d.waterPlan)||!ids(d.water)||d.water.some(id=>!d.waterPlan.some(w=>w.id===id))||!ids(d.workoutDone)||!ids(d.care)||!str(d.careNote)||!items(d.schedule,x=>(x.time===''||time(x.time))&&str(x.title,200)&&Object.hasOwn(statuses,x.status)&&str(x.note))||!items(d.meals,x=>str(x.name,200)&&str(x.meal,100)&&mealDetails(x)&&typeof x.estimated==='boolean'&&str(x.note)&&['kcal','protein','carbs','fat','fiber','sodium'].every(k=>x[k]===null||num(x[k]))))fail();
   }return s;
  }
  function parseImport(raw){if(typeof raw!=='string'||raw.length>5000000)throw Error('ไฟล์ใหญ่เกิน 5 MB');return validate(JSON.parse(raw));}
