@@ -54,6 +54,6 @@
 
 - Added formula examples, unrounded BMI boundaries, both equation sexes, PAL ranges, unknown inputs, child and older-adult applicability, positive-energy guard, import validation, and legacy backup compatibility tests.
 - Added DOM checks for the requested navigation order, live results, explicit save/reload, keeping existing meals, clearing stale results, and avoiding adult interpretation for younger ages.
-- Local syntax and 31 core/API/photo/calculation tests pass. Full local testing is limited by npm directory permissions, unavailable jsdom, and EACCES on loopback server requests. GitHub Actions must complete the full suite before publication.
+- Local syntax and 31 core/API/photo/calculation tests pass. Full local testing is limited by npm directory permissions, unavailable jsdom, and EACCES on loopback server requests. GitHub Actions Check app run 39407020562 completed clean installation, syntax checks, and all 73 tests successfully before release.
 - No phone/tablet/desktop browser visual verification has been performed for this page in this session.
 
