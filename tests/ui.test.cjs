@@ -5,6 +5,22 @@ const path=require('node:path');
 const {JSDOM,VirtualConsole}=require('jsdom');
 const C=require('../dist/core.js');
 const KEY='jai-daily.v1';
+test('body menu sits below dashboard and above water; live values save and reload without changing nutrition',t=>{
+ const a=setup(t),nav=a.all('#navigation [data-page]').map(x=>x.dataset.page);
+ assert.deepEqual(nav.slice(0,3),['dashboard','body','water']);a.page('body');assert.equal(a.q('#dailySave').hidden,true);
+ assert.equal(a.q('#bodyBmi').textContent,'—');
+ for(const [name,value] of Object.entries({age:'30',sex:'male',height:'180',weight:'81',activity:'moderate'})){
+  const field=a.q(`#bodyForm [name="${name}"]`);field.value=value;field.dispatchEvent(new a.w.Event('input',{bubbles:true}));
+ }
+ assert.equal(Number(a.q('#bodyBmi').textContent),25);assert.match(a.q('#bodyRee').textContent,/1,790/);assert.match(a.q('#bodyTdee').textContent,/3,043/);
+ assert.equal(a.w.localStorage.getItem(KEY),null);a.q('#bodyForm').requestSubmit();assert.equal(a.stored().settings.body.weight,81);assert.equal(a.stored().days['2026-10-19'].meals.length,3);
+ const b=setup(t,{raw:JSON.stringify(a.stored())});b.page('body');assert.equal(b.q('#bodyForm [name="weight"]').value,'81');assert.equal(Number(b.q('#bodyBmi').textContent),25);
+ b.q('#bodyForm [name="weight"]').value='';b.q('#bodyForm [name="weight"]').dispatchEvent(new b.w.Event('input',{bubbles:true}));assert.equal(b.q('#bodyBmi').textContent,'—');assert.equal(b.q('#bodyRee').textContent,'—');
+});
+test('body calculator keeps adult classifications and energy out of child results',t=>{
+ const s=C.createState();s.settings.body={age:15,sex:'female',height:150,weight:45,activity:'light'};
+ const a=setup(t,{raw:JSON.stringify(s)});a.page('body');assert.equal(Number(a.q('#bodyBmi').textContent),20);assert.equal(a.q('#bodyRee').textContent,'—');assert.equal(a.q('#bodyTdee').textContent,'—');assert.match(a.q('#bodyCategory').textContent,/อายุ/);
+});
 test('care morning and afternoon lists support adding moving editing deleting and daily persistence',t=>{
  const a=setup(t);a.date('2026-10-20');a.page('care');
  assert.match(a.q('[data-care-period="morning"]').textContent,/ดูแลตัวเองตอนเช้า/);
@@ -41,6 +57,7 @@ function setup(t,{width=1440,raw=null,blocked=false}={}){
  if(blocked)w.Storage.prototype.setItem=function(){throw Error('QuotaExceededError');};
  w.eval(fs.readFileSync(path.join(__dirname,'../dist/core.js'),'utf8'));
  w.eval(fs.readFileSync(path.join(__dirname,'../dist/food-photo.js'),'utf8'));
+ w.eval(fs.readFileSync(path.join(__dirname,'../dist/body-page.js'),'utf8'));
  w.eval(fs.readFileSync(path.join(__dirname,'../dist/app.js'),'utf8'));
  t.after(()=>{assert.deepEqual(errors,[]);dom.window.close();});
  const q=s=>doc.querySelector(s),all=s=>[...doc.querySelectorAll(s)];
@@ -57,7 +74,7 @@ test('all routes render at phone tablet and desktop navigation breakpoints',t=>{
  for(const width of [375,390,768,1024,1440]){
   const a=setup(t,{width});
   if(width<=900){assert.equal(a.q('#sidebar').inert,true);a.click('#menuButton');assert.equal(a.q('#menuButton').getAttribute('aria-expanded'),'true');assert.equal(a.q('#scrim').hidden,false);a.click('#closeNav');assert.equal(a.q('#sidebar').inert,true);}
-  for(const p of ['water','schedule','workout','meals','care','settings','dashboard']){a.page(p);assert.ok(a.q('#pageTitle').textContent);assert.ok(a.q('#content').innerHTML.length>100);}
+  for(const p of ['body','water','schedule','workout','meals','care','settings','dashboard']){a.page(p);assert.ok(a.q('#pageTitle').textContent);assert.ok(a.q('#content').innerHTML.length>100);}
  }
 });
 test('water totals update immediately, untick, survive reload and stay separate by date',t=>{

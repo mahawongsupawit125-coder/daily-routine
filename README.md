@@ -177,3 +177,13 @@ upload-github.cmd  อัปโหลด commit จากโฟลเดอร�
 
 The self-care page now has morning and afternoon sections with an Add button in each section. The editor can change the period, title, and notes. Existing items without a period remain under an unassigned section until the user selects a period. Existing IDs and daily completion records are preserved. Items remain shared across dates; completion remains per day and browser-local.
 
+# Body calculator (2026-10-20)
+
+The navigation order starts with Dashboard, Body Calculator, then Water. The Thai calculator updates BMI, adult BMI category, reference weight range, estimated resting energy (REE), and an approximate TDEE range as inputs change. Age, sex used by the equation, height in cm, weight in kg, and optional habitual activity are entered by the user; no measurements are prefilled from guesses.
+
+The Save button retains the latest profile under optional `settings.body` in `jai-daily.v1`, included in JSON export/import. The profile is shared across dates and remains browser-local. Editing inputs shows a draft until explicitly saved. This calculator does not set calorie goals, water goals, nutrition quotas, or weight-loss prescriptions.
+
+BMI interpretation and weight reference range use CDC adult cutoffs (age 20+). Younger users see numeric BMI without adult classification. REE uses the simplified Mifflin-St Jeor equation and is displayed only for ages 20-78 with a supplied equation sex and a positive prediction. TDEE is a rough adaptation of REE times FAO/WHO/UNU PAL ranges (light 1.40-1.69, moderate 1.70-1.99, high 2.00-2.40); PAL was defined relative to BMR, so using estimated REE adds uncertainty. It is not a measured value or a statistical confidence interval. Sources and limitations are linked in the page.
+
+GitHub Pages now also publishes changes to `dist/` pushed to `main`, after successful clean installation, syntax checks, and the full test suite. Manual workflow dispatch remains available.
+

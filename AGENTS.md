@@ -7,4 +7,4 @@
 - The user explicitly requested: after completing a coherent set of file changes, run the relevant checks, commit and push to `https://github.com/mahawongsupawit125-coder/daily-routine.git`. Continue doing so for this project without asking again. Preserve remote changes, never force push, and never commit credentials, node_modules, or personal JSON backups.
 - Run `npm ci`, `npm run check`, and `npm test` for a clean test environment. `npm start` needs no installed dependencies.
 - Report browser rendering checks separately from DOM simulation tests. Do not claim mobile/tablet/desktop visual verification unless actually performed.
-- Publication is a separate action from pushing source; the included Pages workflow runs manually.
+- The Pages workflow supports manual dispatch and automatically publishes changes to dist/ on main after installation, syntax checks, and the full test suite pass. Verify deployment success separately from pushing source.

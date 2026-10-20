@@ -23,6 +23,19 @@
  function nutrition(meals){return Object.fromEntries(['kcal','protein','carbs','fat','fiber','sodium'].map(k=>[k,{value:meals.reduce((a,x)=>a+(x[k]??0),0),missing:meals.filter(x=>x[k]===null).length}]));}
  function workoutFor(s,date){const group=s.week[new Date(date+'T12:00:00').getDay()];return {group,...s.workouts[group]};}
  function validDate(v){return typeof v==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(v)&&!Number.isNaN(Date.parse(v))&&new Date(v).toISOString().slice(0,10)===v;}
+ const bodyActivityRanges={light:[1.4,1.69],moderate:[1.7,1.99],high:[2,2.4]};
+ function validateBody(p){
+  const between=(v,min,max)=>typeof v==='number'&&Number.isFinite(v)&&v>=min&&v<=max;
+  if(!p||typeof p!=='object'||Array.isArray(p)||!between(p.age,1,120)||!Number.isInteger(p.age)||!between(p.height,50,250)||!between(p.weight,10,400)||!['','male','female'].includes(p.sex)||!['','light','moderate','high'].includes(p.activity))throw Error('กรอกอายุ 1–120 ปี ส่วนสูง 50–250 ซม. น้ำหนัก 10–400 กก. และเลือกข้อมูลให้ถูกต้อง');
+  return p;
+ }
+ function bodyMetrics(profile){
+  const p=validateBody(profile),square=(p.height/100)**2,bmi=p.weight/square,adult=p.age>=20;
+  const category=!adult?null:bmi<18.5?'underweight':bmi<25?'healthy':bmi<30?'overweight':bmi<35?'obesity1':bmi<40?'obesity2':'obesity3';
+  const predicted=adult&&p.age<=78&&p.sex?10*p.weight+6.25*p.height-5*p.age+(p.sex==='male'?5:-161):null,ree=predicted>0?predicted:null;
+  const factors=bodyActivityRanges[p.activity];
+  return {bmi,category,weightRange:adult?{min:18.5*square,max:25*square}:null,ree,tdee:ree!==null&&factors?{min:ree*factors[0],max:ree*factors[1]}:null};
+ }
  function validate(s,legacy=false){
   const fail=()=>{throw Error('รูปแบบข้อมูลไม่ถูกต้อง หรือไฟล์เป็นเวอร์ชันที่ไม่รองรับ');};
   const str=(x,n=2000)=>typeof x==='string'&&x.length<=n;
@@ -34,6 +47,7 @@
   const waterOK=a=>items(a,x=>time(x.time)&&num(x.ml,10000)&&x.ml>0);
   const careCategory=x=>(x.category==='self'||(legacy&&x.category==='pet'))&&(x.period===undefined||['morning','afternoon'].includes(x.period));
   const mealDetails=x=>(x.time===undefined||x.time===''||time(x.time))&&(x.portion===undefined||str(x.portion,200))&&(x.source===undefined||['manual','photo-ai'].includes(x.source));
+  if(s?.settings?.body!==undefined)validateBody(s.settings.body);
   if(!s||s.version!==1||!s.settings||!str(s.settings.name,80)||!num(s.settings.waterReference,20000)||!waterOK(s.water)||!s.workouts||!arr(s.week,x=>['A','B','rest','active'].includes(x),7)||s.week.length!==7)fail();
   for(const k of ['A','B','rest','active']){const w=s.workouts[k];if(!w||!str(w.title,200)||!items(w.exercises,x=>str(x.name,200)&&num(x.sets,100)&&Number.isInteger(x.sets)&&x.sets>0&&str(x.reps,200)&&str(x.note)))fail();}
   if(!items(s.phases,x=>str(x.name,100)&&num(x.minutes,500))||!items(s.care,x=>str(x.title,200)&&careCategory(x)&&str(x.note))||!s.days||typeof s.days!=='object'||Array.isArray(s.days)||Object.keys(s.days).length>10000)fail();
@@ -67,6 +81,6 @@
   return s;
  }
  function parseImport(raw){if(typeof raw!=='string'||raw.length>5000000)throw Error('ไฟล์ใหญ่เกิน 5 MB');return validate(removeLegacyAnimalData(validate(JSON.parse(raw),true)));}
- const api={uid,clone,createState,day,waterStats,nutrition,workoutFor,parseImport,validate,validDate,statuses};
+ const api={uid,clone,createState,day,waterStats,nutrition,workoutFor,parseImport,validate,validDate,statuses,bodyMetrics};
  if(typeof module!=='undefined')module.exports=api;else root.Jai=api;
 })(globalThis);

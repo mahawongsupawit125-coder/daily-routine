@@ -50,3 +50,10 @@
 - Local full-suite execution is blocked: npm ci cannot complete dependency downloads; UI tests cannot load jsdom. Seven local server tests fail with EACCES connecting to loopback in this sandbox.
 - Browser rendering has not been verified in this session. GitHub Actions results should be checked before publication.
 
+# Body calculator verification (2026-10-20)
+
+- Added formula examples, unrounded BMI boundaries, both equation sexes, PAL ranges, unknown inputs, child and older-adult applicability, positive-energy guard, import validation, and legacy backup compatibility tests.
+- Added DOM checks for the requested navigation order, live results, explicit save/reload, keeping existing meals, clearing stale results, and avoiding adult interpretation for younger ages.
+- Local syntax and 31 core/API/photo/calculation tests pass. Full local testing is limited by npm directory permissions, unavailable jsdom, and EACCES on loopback server requests. GitHub Actions must complete the full suite before publication.
+- No phone/tablet/desktop browser visual verification has been performed for this page in this session.
+

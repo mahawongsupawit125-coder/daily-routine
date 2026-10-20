@@ -1,0 +1,13 @@
+.body-intro{margin-bottom:24px;background:linear-gradient(115deg,#e7f6fb,#f6fcff)}
+.body-intro h2{margin-bottom:8px}.body-intro p:last-child{margin-bottom:0}
+.body-calculator{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.1fr);gap:24px;align-items:start}
+.body-fields,.body-results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+#bodyForm .field{min-width:0}#bodyForm input,#bodyForm select{width:100%;min-width:0}#bodyForm p{margin-top:12px}
+.body-summary{margin:0 0 12px}.body-metric{min-width:0;padding:22px}.body-metric h3{font-size:14px;line-height:1.6;margin:0;color:var(--muted,#5c7180)}
+.body-value{display:flex;flex-direction:column;gap:4px;margin:14px 0}.body-value output{font-size:clamp(22px,2.3vw,32px);font-weight:700;line-height:1.35;overflow-wrap:anywhere;color:#087ea4;font-variant-numeric:tabular-nums}
+#bodyBmi{font-size:44px}.body-value>span{font-size:12px;color:var(--muted,#5c7180)}.body-metric p{margin:0;line-height:1.7}
+.body-category{background:#e9f6fa;border-left:4px solid #087ea4;padding:14px 16px;border-radius:12px;font-weight:600;margin:16px 0}
+.body-reference{margin-top:24px}.body-table-wrap{overflow-x:auto}.body-table{width:100%;border-collapse:collapse;font-size:14px;margin:14px 0}.body-table th,.body-table td{text-align:left;padding:12px 14px;border-bottom:1px solid #e3edf2;font-weight:400}.body-table thead th{font-weight:600;background:#f1f8fb}.body-table tr.is-current{background:#e2f4fa;color:#065f7b}.body-table tr.is-current th{font-weight:700}
+.body-method{margin-top:18px;border-top:1px solid #e3edf2;padding-top:16px}.body-method summary{cursor:pointer;font-weight:600;color:#087ea4}.body-method p{font-size:13px;line-height:1.8}.body-sources{display:flex;flex-wrap:wrap;gap:10px 20px;margin-top:14px;font-size:13px}.body-sources a{color:#087ea4;text-decoration:underline}.body-sources a:focus-visible,.body-method summary:focus-visible{outline:3px solid #16b7cf;outline-offset:4px}
+@media(max-width:1100px){.body-calculator{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:480px){.body-fields{grid-template-columns:minmax(0,1fr)}.body-results{gap:10px}.body-metric{padding:15px}.body-value output{font-size:21px}#bodyBmi{font-size:36px}.body-table th,.body-table td{padding:10px 8px;font-size:12px}}

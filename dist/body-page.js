@@ -1,0 +1,42 @@
+/* Browser-local body calculator. Screening values and energy estimates are not prescriptions. */
+(()=>{'use strict';
+ const e=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const number=(v,digits=0)=>v.toLocaleString('en-US',{minimumFractionDigits:digits,maximumFractionDigits:digits});
+ const labels={underweight:'ต่ำกว่าเกณฑ์',healthy:'อยู่ในเกณฑ์อ้างอิง',overweight:'น้ำหนักเกินเกณฑ์',obesity1:'อยู่ในช่วงภาวะอ้วน ระดับ 1',obesity2:'อยู่ในช่วงภาวะอ้วน ระดับ 2',obesity3:'อยู่ในช่วงภาวะอ้วน ระดับ 3'};
+ const ranges=[['underweight','ต่ำกว่าเกณฑ์','น้อยกว่า 18.5'],['healthy','อยู่ในเกณฑ์อ้างอิง','18.5 ถึงน้อยกว่า 25'],['overweight','น้ำหนักเกินเกณฑ์','25 ถึงน้อยกว่า 30'],['obesity1','ภาวะอ้วน ระดับ 1','30 ถึงน้อยกว่า 35'],['obesity2','ภาวะอ้วน ระดับ 2','35 ถึงน้อยกว่า 40'],['obesity3','ภาวะอ้วน ระดับ 3','40 ขึ้นไป']];
+ const metric=(id,title,unit,note)=>`<article class="card body-metric"><h3>${title}</h3><div class="body-value"><output id="${id}">—</output><span>${unit}</span></div><p id="${id}Note" class="small muted">${note}</p></article>`;
+ const field=(label,name,p,min,max,step,unit)=>`<label class="field"><span>${label} (${unit})</span><input name="${name}" type="number" inputmode="decimal" min="${min}" max="${max}" step="${step}" required value="${e(p?.[name]??'')}" placeholder="${name==='age'?'เช่น 22':name==='height'?'เช่น 170':'เช่น 60'}"><small>${min}–${max} ${unit}</small></label>`;
+ function render(profile,saved=true){
+  const p=profile||{};
+  return `<section class="card body-intro"><p class="eyebrow">KNOW YOUR BODY</p><h2>รู้จักร่างกายของคุณ</h2><p>กรอกข้อมูลเพื่อดู BMI ช่วงน้ำหนักอ้างอิง และพลังงานโดยประมาณ ผลเปลี่ยนทันทีเมื่อแก้ข้อมูล</p></section>
+   <div class="body-calculator"><section class="card"><div class="card-header"><div><h2>ข้อมูลร่างกาย</h2><p>ส่วนสูงเป็นเซนติเมตร · น้ำหนักเป็นกิโลกรัม</p></div></div><form id="bodyForm">
+   <div class="body-fields">${field('อายุ','age',p,1,120,1,'ปี')}<label class="field"><span>เพศที่ใช้ในสมการพลังงาน</span><select name="sex"><option value="">ยังไม่ระบุ</option>${[['male','ชาย'],['female','หญิง']].map(([v,title])=>`<option value="${v}" ${p.sex===v?'selected':''}>${title}</option>`).join('')}</select><small>ใช้กับสมการพลังงาน · BMI คำนวณจากส่วนสูงและน้ำหนัก</small></label>${field('ส่วนสูง','height',p,50,250,0.1,'ซม.')}${field('น้ำหนัก','weight',p,10,400,0.1,'กก.')}</div>
+   <label class="field"><span>ระดับกิจกรรมโดยรวม</span><select name="activity">${[['','ยังไม่ระบุ'],['light','นั่งเป็นส่วนใหญ่ / กิจกรรมเบา'],['moderate','เคลื่อนไหวหรือออกกำลังกายสม่ำเสมอ'],['high','งานใช้แรงหรือกิจกรรมหนักหลายชั่วโมง']].map(([v,title])=>`<option value="${v}" ${(p.activity||'')===v?'selected':''}>${title}</option>`).join('')}</select><small>พิจารณาทั้งงาน การเดินทาง และการออกกำลังกายในชีวิตประจำวัน</small></label>
+   <p id="bodyError" class="error" role="alert"></p><button class="btn primary" type="submit">บันทึกข้อมูลร่างกาย</button><p id="bodySaveStatus" class="small muted" role="status">${profile?(saved?'มีข้อมูลที่บันทึกไว้ในเบราว์เซอร์นี้':'ข้อมูลในหน้านี้ยังไม่ได้บันทึกถาวร'):'ยังไม่ได้บันทึกข้อมูลร่างกาย'}</p><p class="small muted">กดบันทึกเพื่อจำข้อมูลก่อนเปลี่ยนหน้า · ใช้ข้อมูลล่าสุดร่วมทุกวัน · ยังไม่ซิงก์ข้ามเครื่อง</p></form></section>
+   <div><p id="bodySummary" class="small muted body-summary">กรอกอายุ ส่วนสูง และน้ำหนักเพื่อเริ่มคำนวณ</p><div class="body-results">
+   ${metric('bodyBmi','ดัชนีมวลกาย · BMI','กก./ม²','ค่าคัดกรองจากน้ำหนักและส่วนสูง')}
+   ${metric('bodyWeightRange','ช่วงน้ำหนักอ้างอิง','กก.','ตาม BMI 18.5 ถึงน้อยกว่า 25 สำหรับอายุ 20 ปีขึ้นไป')}
+   ${metric('bodyRee','พลังงานขณะพัก · REE','kcal/วัน','ประมาณการด้วยสมการ Mifflin–St Jeor')}
+   ${metric('bodyTdee','พลังงานรวมต่อวัน · TDEE','kcal/วัน','ช่วงประมาณการตามระดับกิจกรรม')}
+   </div><p id="bodyCategory" class="body-category" role="status">รอข้อมูลเพื่อแปลผล BMI</p><p class="small muted">BMI เป็นค่าคัดกรอง ไม่ได้บอกสัดส่วนไขมันหรือกล้ามเนื้อ พลังงานเป็นค่าประมาณสำหรับผู้ใหญ่ทั่วไป ไม่ใช่โควตาอาหาร และไม่ใช้แทนคำแนะนำเฉพาะบุคคลขณะตั้งครรภ์ ให้นม หรือมีภาวะเจ็บป่วย</p></div></div>
+   <section class="card body-reference"><h2>เกณฑ์ BMI สำหรับผู้ใหญ่อายุ 20 ปีขึ้นไป</h2><div class="body-table-wrap"><table class="body-table"><thead><tr><th scope="col">การแปลผล</th><th scope="col">BMI (กก./ม²)</th></tr></thead><tbody>${ranges.map(([key,title,range])=>`<tr data-body-category="${key}"><th scope="row">${title}</th><td>${range}</td></tr>`).join('')}</tbody></table></div><p class="small muted">ใช้เกณฑ์ผู้ใหญ่ของ CDC · ไม่ใช่เกณฑ์เอเชียเฉพาะกลุ่ม · จัดกลุ่มจากค่าก่อนปัดเศษ · อายุต่ำกว่า 20 ปีแสดงเฉพาะตัวเลข BMI โดยไม่แปลผลด้วยเกณฑ์ผู้ใหญ่</p>
+   <details class="body-method"><summary>สูตร วิธีอ่านค่า และแหล่งอ้างอิง</summary><p>BMI = น้ำหนัก (กก.) ÷ ส่วนสูง (เมตร)² ช่วงน้ำหนักอ้างอิงคำนวณกลับจาก BMI 18.5 ถึงน้อยกว่า 25 เป็นช่วงคัดกรองทั่วไป ไม่ใช่น้ำหนักเป้าหมายเฉพาะบุคคล</p><p>พลังงานขณะพัก (REE): ชาย = 10 × น้ำหนัก + 6.25 × ส่วนสูง − 5 × อายุ + 5; หญิง = 10 × น้ำหนัก + 6.25 × ส่วนสูง − 5 × อายุ − 161 หน่วย kcal/วัน ใช้ประมาณการสำหรับอายุ 20–78 ปีในหน้านี้ ไม่ใช่การวัด BMR ในห้องปฏิบัติการ</p><p>TDEE ในหน้านี้ประมาณอย่างหยาบจาก REE × ช่วงตัวคูณกิจกรรม (PAL): เบา 1.40–1.69, ปานกลาง 1.70–1.99, หนัก 2.00–2.40 เป็นการประยุกต์ช่วง PAL ของ FAO/WHO/UNU ซึ่งอ้างอิงพลังงานพื้นฐาน (BMR) จึงมีความคลาดเคลื่อนเมื่อใช้ REE แทน และไม่ใช่โมเดลเฉพาะบุคคลหรือช่วงความเชื่อมั่นทางสถิติ</p><p>การคำนวณนี้ไม่ได้ประเมินไขมัน กล้ามเนื้อ หรือโรคจากข้อมูลเพียงสี่อย่างนี้</p><div class="body-sources"><a href="https://www.cdc.gov/bmi/adult-calculator/bmi-categories.html" target="_blank" rel="noopener noreferrer">CDC: เกณฑ์ BMI ผู้ใหญ่</a><a href="https://pubmed.ncbi.nlm.nih.gov/2305711/" target="_blank" rel="noopener noreferrer">Mifflin–St Jeor: สมการพลังงานขณะพัก</a><a href="https://www.fao.org/4/y5686e/y5686e07.htm" target="_blank" rel="noopener noreferrer">FAO/WHO/UNU: ระดับกิจกรรม PAL</a></div></details></section>`;
+ }
+ function read(form){const f=new FormData(form);return {age:Number(f.get('age')),sex:String(f.get('sex')||''),height:Number(f.get('height')),weight:Number(f.get('weight')),activity:String(f.get('activity')||'')};}
+ function update(form,dirty=false){
+  let p=null,r=null,error='';const missing=['age','height','weight'].some(k=>form.elements[k].value==='');
+  if(!missing){try{if(!form.checkValidity())throw Error('ตรวจอายุ ส่วนสูง และน้ำหนักให้อยู่ในช่วงที่ระบุ');p=read(form);r=window.Jai.bodyMetrics(p);}catch(err){error=err.message;}}
+  const set=(id,text)=>document.getElementById(id).textContent=text;
+  for(const id of ['bodyBmi','bodyWeightRange','bodyRee','bodyTdee'])set(id,'—');
+  set('bodyError',error);set('bodySummary',r?`อายุ ${p.age} ปี · ส่วนสูง ${number(p.height,1)} ซม. · น้ำหนัก ${number(p.weight,1)} กก.`:'กรอกอายุ ส่วนสูง และน้ำหนักให้ครบและถูกต้องเพื่อคำนวณ');
+  set('bodyCategory',!r?'รอข้อมูลเพื่อแปลผล BMI':r.category?`BMI ${number(r.bmi,2)} · ${labels[r.category]}`:'อายุต่ำกว่า 20 ปี ต้องแปลผลตามอายุและเพศ จึงไม่ใช้เกณฑ์ผู้ใหญ่');
+  set('bodyWeightRangeNote',!r||r.weightRange?'ตาม BMI 18.5 ถึงน้อยกว่า 25 สำหรับอายุ 20 ปีขึ้นไป':'ไม่แสดงช่วงน้ำหนักผู้ใหญ่สำหรับอายุต่ำกว่า 20 ปี');
+  set('bodyReeNote',!r?'ประมาณการด้วยสมการ Mifflin–St Jeor':p.age<20||p.age>78?'หน้านี้ประมาณพลังงานสำหรับอายุ 20–78 ปีเท่านั้น':!p.sex?'เลือกเพศที่ใช้ในสมการเพื่อคำนวณพลังงาน':r.ree===null?'ข้อมูลชุดนี้ไม่เหมาะกับการประมาณพลังงานด้วยสมการนี้':'ค่าประมาณขณะพัก ไม่ใช่ปริมาณอาหารที่ต้องกิน');
+  set('bodyTdeeNote',r?.tdee?'ช่วงประมาณการจาก REE × ช่วงตัวคูณกิจกรรม':r?.ree!==null&&r?.ree!==undefined?'เลือกระดับกิจกรรมเพื่อคำนวณ TDEE':'ต้องมีค่าพลังงานขณะพักและระดับกิจกรรมก่อน');
+  if(r){set('bodyBmi',number(r.bmi,2));if(r.weightRange)set('bodyWeightRange',`${number(r.weightRange.min,2)} ถึง < ${number(r.weightRange.max,2)}`);if(r.ree!==null)set('bodyRee',number(r.ree));if(r.tdee)set('bodyTdee',`${number(r.tdee.min)}–${number(r.tdee.max)}`);}
+  document.querySelectorAll('[data-body-category]').forEach(row=>{const active=!!r?.category&&row.dataset.bodyCategory===r.category;row.classList.toggle('is-current',active);if(active)row.setAttribute('aria-current','true');else row.removeAttribute('aria-current');});
+  if(dirty)set('bodySaveStatus','ผลคำนวณล่าสุด · ยังไม่ได้บันทึกการแก้ไข');
+  return r?{profile:p,result:r}:null;
+ }
+ window.JaiBody={render,read,update};
+})();
