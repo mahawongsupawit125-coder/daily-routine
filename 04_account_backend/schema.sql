@@ -17,7 +17,7 @@ create policy own_profile on public.account_profiles for select to authenticated
 
 create table public.routine_data (
  user_id uuid primary key references auth.users(id) on delete cascade,
- state jsonb not null check(jsonb_typeof(state)='object' and state->>'version'='1' and octet_length(state::text)<=5000000),
+ state jsonb not null check(jsonb_typeof(state)='object' and state @> '{"version":1}'::jsonb and octet_length(state::text)<=5000000),
  revision bigint not null default 1 check(revision>0),
  updated_at timestamptz not null default now()
 );
@@ -97,3 +97,4 @@ end;$$;
 revoke all on function public.account_save(uuid,jsonb,bigint) from public,anon,authenticated;
 grant execute on function public.account_save(uuid,jsonb,bigint) to service_role;
 commit;
+

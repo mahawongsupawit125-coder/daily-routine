@@ -1,9 +1,9 @@
 # Supabase account backend
 
 Project: daily-routine (aoqpijnvptfrwihvbqam), organization daily-routine.
-This source is prepared; it has NOT been applied or deployed. The frontend remains disabled until live acceptance.
+The schema was applied and function account deployed on 2026-10-22. See docs/ACCOUNT-STATUS.md for verified checks and outstanding setup. The frontend remains disabled until live acceptance.
 
-1. Restore the Supabase connection and inspect existing public/private objects before applying schema.sql. This is a one-time bootstrap, not an idempotent migration; do not rerun after success.
+1. schema.sql is a one-time bootstrap already applied to this project. Do not rerun it. For another project, inspect existing public/private objects before applying it.
 2. Run node scripts/account-bundle.cjs. Deploy all four files in .account-build/account as function account, entrypoint index.ts. Set verify_jwt=false because the function checks passwords for login and validates the bearer token through Auth /user for every load/save request. No data request trusts a caller-supplied owner ID.
 3. Supabase injects SUPABASE_URL, SUPABASE_ANON_KEY and SUPABASE_SERVICE_ROLE_KEY in Edge Functions. Never copy the service role key into frontend code, GitHub, or chat.
 4. Set Auth Site URL and allowed redirect URL to https://mahawongsupawit125-coder.github.io/daily-routine/ . Keep email confirmation enabled.
@@ -22,3 +22,4 @@ This source is prepared; it has NOT been applied or deployed. The frontend remai
 - On auth/data network failure the UI must not substitute guest data into an account.
 
 Automated handler tests use controlled HTTP responses and cannot establish real Auth/RLS/SMTP behavior.
+
