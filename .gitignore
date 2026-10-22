@@ -13,3 +13,5 @@ coverage/
 
 # Generated publication output: edit 01_web_app instead.
 dist/
+
+.account-build/
