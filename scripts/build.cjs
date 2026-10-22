@@ -4,6 +4,11 @@ const root=path.resolve(__dirname,'..');
 const source=path.join(root,'01_web_app');
 const assets={
  'public/index.html':'index.html',
+ 'src/shared/account-config.js':'account-config.js',
+ 'src/shared/account-client.js':'account-client.js',
+ 'src/shared/account-data.js':'account-data.js',
+ 'src/shared/account-store.js':'account-store.js',
+ 'assets/styles/account.css':'account.css',
  'src/shared/core.js':'core.js',
  'src/pages/02_body/body-page.js':'body-page.js',
  'src/pages/03_water/hydration.js':'hydration.js',

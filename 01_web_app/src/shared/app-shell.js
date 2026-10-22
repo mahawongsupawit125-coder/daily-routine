@@ -1,7 +1,7 @@
 /* Your Day: no analytics, external fonts or runtime dependencies. Optional photo AI requires explicit consent. */
 (()=>{'use strict';
  const C=window.Jai,KEY='jai-daily.v1',$=s=>document.querySelector(s);
- const paths={menu:'M4 6h16M4 12h16M4 18h16',dashboard:'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z',water:'M12 3C9 7 5 11 5 15a7 7 0 0 0 14 0c0-4-4-8-7-12Z M9 16a3 3 0 0 0 3 3',schedule:'M5 5h14v16H5zM8 3v4M16 3v4M5 10h14M8 14h3M8 17h6',workout:'M3 9v6M6 6v12M6 12h12M18 6v12M21 9v6',meals:'M6 3v7M3 3v4a3 3 0 0 0 6 0V3M6 10v11M17 3c-4 2-4 9 0 9h2M19 3v18',care:'M20 5a5 5 0 0 0-8-1 5 5 0 0 0-8 6l8 10 8-10a5 5 0 0 0 0-5Z',settings:'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM10 3h4l1 3 3 1 3 2v4l-3 2-1 3-3 3h-4l-2-3-3-1-2-3v-4l3-2 1-3Z',check:'M5 12l4 4L19 6',plus:'M12 5v14M5 12h14',edit:'m15 4 5 5M4 20l4-1L21 6l-4-4L4 15Z',arrow:'M5 12h14m-5-5 5 5-5 5',info:'M12 11v6M12 7v.1M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z',download:'M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5',leaf:'M20 3C8 1 2 8 5 15c3 7 15 3 15-12ZM4 21l12-13',clock:'M12 7v5l4 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z',close:'m6 6 12 12M6 18 18 6'};
+ const paths={account:'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4 21v-2a8 8 0 0 1 16 0v2',eye:'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12ZM12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z',menu:'M4 6h16M4 12h16M4 18h16',dashboard:'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z',water:'M12 3C9 7 5 11 5 15a7 7 0 0 0 14 0c0-4-4-8-7-12Z M9 16a3 3 0 0 0 3 3',schedule:'M5 5h14v16H5zM8 3v4M16 3v4M5 10h14M8 14h3M8 17h6',workout:'M3 9v6M6 6v12M6 12h12M18 6v12M21 9v6',meals:'M6 3v7M3 3v4a3 3 0 0 0 6 0V3M6 10v11M17 3c-4 2-4 9 0 9h2M19 3v18',care:'M20 5a5 5 0 0 0-8-1 5 5 0 0 0-8 6l8 10 8-10a5 5 0 0 0 0-5Z',settings:'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM10 3h4l1 3 3 1 3 2v4l-3 2-1 3-3 3h-4l-2-3-3-1-2-3v-4l3-2 1-3Z',check:'M5 12l4 4L19 6',plus:'M12 5v14M5 12h14',edit:'m15 4 5 5M4 20l4-1L21 6l-4-4L4 15Z',arrow:'M5 12h14m-5-5 5 5-5 5',info:'M12 11v6M12 7v.1M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z',download:'M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5',leaf:'M20 3C8 1 2 8 5 15c3 7 15 3 15-12ZM4 21l12-13',clock:'M12 7v5l4 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z',close:'m6 6 12 12M6 18 18 6'};
  const icon=(name)=>`<svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="${paths[name]||paths.leaf}"/></svg>`;
  const e=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const n=x=>Number(x).toLocaleString('th-TH',{maximumFractionDigits:1});
@@ -20,12 +20,14 @@
  const d=()=>C.day(state,date),stats=()=>C.waterStats(state,date);
  function toast(message){$('#toast').textContent=message;$('#toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').hidden=true,3500);}
  function save(message,stamp=true){
+  if(accountUser){saveAccount(message,stamp);return;}
   if(!storageBlocked){const day=stamp?d():null,previous=day?.savedAt;try{if(day)day.savedAt=new Date().toISOString();localStorage.setItem(KEY,JSON.stringify(state));savedDates=new Set(Object.keys(state.days));}catch(err){if(day){if(previous===undefined)delete day.savedAt;else day.savedAt=previous;}storageBlocked=true;storageIssue='บันทึกไม่สำเร็จ พื้นที่อาจเต็มหรือเบราว์เซอร์จำกัดการบันทึก ส่งออก JSON เพื่อเก็บข้อมูลก่อนปิดหน้า';}}
   updateSaveStatus();
   if(storageBlocked){$('#saveState').textContent='ยังไม่ได้บันทึกถาวร';if(message)toast('ยังบันทึกในเครื่องไม่ได้ · ส่งออก JSON เพื่อสำรอง');}else if(message)toast(message);
  }
  const savedTime=value=>new Date(value).toLocaleString('th-TH',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'});
  function updateSaveStatus(){
+  if(accountUser){$('#saveState').textContent=accountStatusText();$('#dailySaveStatus').textContent=accountStatusText();$('#dailySaveDate').textContent=thaiDate(date);return;}
   const day=state.days[date],saved=savedDates.has(date);
   $('#saveState').textContent=storageBlocked?'ยังไม่ได้บันทึกถาวร':saved?'บันทึกแล้วในเครื่อง':'บันทึกอัตโนมัติ';
   $('#dailySaveStatus').textContent=storageBlocked?'ยังไม่ได้บันทึกถาวร · ส่งออก JSON เพื่อสำรองข้อมูล':saved?(day.savedAt?'บันทึกล่าสุด '+savedTime(day.savedAt):'บันทึกเดิมในเครื่อง · ไม่ทราบเวลาบันทึก'):'ยังไม่มีบันทึกของวันที่เลือก · กดบันทึกเพื่อเก็บวันนี้';
@@ -46,13 +48,15 @@
 /* @include src/pages/05_workout/page.js */
 /* @include src/pages/07_self_care/page.js */
 /* @include src/pages/09_settings/page.js */
+/* @include src/pages/10_account/page.js */
+ routes.account=['บัญชี','บัญชีของคุณ','เข้าสู่ระบบและบันทึกข้อมูลของคุณ'];
  function render(){
   $('#selectedDate').value=date;$('#pageTitle').textContent=routes[page][1];$('#pageSubtitle').textContent=routes[page][2];$('#breadcrumb').textContent=routes[page][0];$('#eyebrow').textContent=page==='dashboard'?'YOUR EVERYDAY, A LITTLE BETTER':'YOUR DAY / '+page.toUpperCase();
-  $('#navigation').innerHTML=Object.keys(routes).filter(k=>k!=='settings').map(k=>`<button class="nav-item ${k===page?'active':''}" data-page="${k}" ${k===page?'aria-current="page"':''}>${icon(k==='history'?'clock':k==='body'?'care':k)}${routes[k][0]}</button>`).join('');
+  $('#navigation').innerHTML=Object.keys(routes).filter(k=>k!=='settings'&&k!=='account').map(k=>`<button class="nav-item ${k===page?'active':''}" data-page="${k}" ${k===page?'aria-current="page"':''}>${icon(k==='history'?'clock':k==='body'?'care':k)}${routes[k][0]}</button>`).join('');
   $('#settingsNav').innerHTML=icon('settings')+'ตั้งค่า';$('#settingsNav').classList.toggle('active',page==='settings');$('#settingsNav').setAttribute('aria-current',page==='settings'?'page':'false');
-  const html={dashboard,body:()=>window.JaiBody.render(state.settings.body,!storageBlocked),water:waterPage,schedule:schedulePage,workout:workoutPage,meals:mealsPage,care:carePage,settings:settingsPage,history:dailyHistory}[page]();
-  $('#content').innerHTML=(storageBlocked?`<div class="storage-banner">${notice(e(storageIssue)+' <button class="text-btn" data-page="settings">จัดการ / สำรองข้อมูล</button>','error')}</div>`:'')+html+historySection();
-  $('#dailySave').hidden=page==='settings'||page==='history'||page==='body';$('.date-tools').hidden=page==='body';if(page==='body')window.JaiBody.update($('#bodyForm'));updateSaveStatus();
+  const html=accountUser&&(!accountStore?.ready||accountSessionChanged)&&page!=='account'?notice('กำลังรอข้อมูลบัญชี กรุณาเปิดหน้าบัญชีเพื่อลองใหม่','warning'):{dashboard,body:()=>window.JaiBody.render(state.settings.body,!storageBlocked),water:waterPage,schedule:schedulePage,workout:workoutPage,meals:mealsPage,care:carePage,settings:settingsPage,history:dailyHistory,account:accountPage}[page]();
+  $('#content').innerHTML=(storageBlocked?`<div class="storage-banner">${notice(e(storageIssue)+' <button class="text-btn" data-page="settings">จัดการ / สำรองข้อมูล</button>','error')}</div>`:'')+html+(accountUser&&(!accountStore?.ready||accountSessionChanged)?'':historySection());
+  $('#dailySave').hidden=page==='settings'||page==='history'||page==='body'||page==='account'||!accountCanEdit();$('.date-tools').hidden=page==='body'||page==='account';if(page==='body'&&$('#bodyForm'))window.JaiBody.update($('#bodyForm'));updateSaveStatus();
  }
  function historySection(){
   if(page==='care'){
@@ -153,7 +157,7 @@
  window.addEventListener('hashchange',()=>{const next=location.hash.slice(1);if(Object.hasOwn(routes,next)&&next!==page){page=next;render();closeNav();}});
  const mq=matchMedia('(max-width:900px)');mq.addEventListener('change',()=>{document.body.classList.remove('nav-collapsed');closeNav();$('#sidebar').inert=mq.matches;$('#menuButton').setAttribute('aria-expanded',String(!mq.matches));});
  document.addEventListener('keydown',ev=>{if(!document.body.classList.contains('nav-open'))return;if(ev.key==='Escape'){closeNav();$('#menuButton').focus();}if(ev.key==='Tab'){const items=[...$('#sidebar').querySelectorAll('button')].filter(x=>x.getClientRects().length);if(ev.shiftKey&&document.activeElement===items[0]){ev.preventDefault();items.at(-1).focus();}else if(!ev.shiftKey&&document.activeElement===items.at(-1)){ev.preventDefault();items[0].focus();}}});
- window.addEventListener('storage',ev=>{if(ev.key===KEY){storageBlocked=true;storageIssue='ข้อมูลถูกเปลี่ยนจากอีกแท็บ กรุณาส่งออกงานในแท็บนี้ก่อน แล้วรีเฟรชหน้าเพื่อใช้ข้อมูลล่าสุด';render();}});
+ window.addEventListener('storage',ev=>{if(!accountUser&&ev.key===KEY){storageBlocked=true;storageIssue='ข้อมูลถูกเปลี่ยนจากอีกแท็บ กรุณาส่งออกงานในแท็บนี้ก่อน แล้วรีเฟรชหน้าเพื่อใช้ข้อมูลล่าสุด';render();}});
  window.JaiFood.init({getDate:()=>date,openSettings:()=>navigate('settings'),onReview:(draft,targetDate)=>{selectDate(targetDate);navigate('meals');openEditor('meal',undefined,undefined,draft);}});
- closeNav();$('#sidebar').inert=mq.matches;$('#menuButton').setAttribute('aria-expanded',String(!mq.matches));render();
+ initAccount();closeNav();$('#sidebar').inert=mq.matches;$('#menuButton').setAttribute('aria-expanded',String(!mq.matches));render();
 })();
