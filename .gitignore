@@ -9,3 +9,7 @@ coverage/
 .dev.vars.*
 .wrangler/
 *.zip
+
+
+# Generated publication output: edit 01_web_app instead.
+dist/

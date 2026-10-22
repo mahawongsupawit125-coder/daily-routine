@@ -1,5 +1,12 @@
 # ผลตรวจ วันของคุณ
 
+## Repository organization (2026-10-22)
+
+- Source is grouped into 01_web_app (nine actual pages and shared code), 02_food_ai_api, 03_tests, docs and scripts. Runtime files in dist/ are generated and ignored.
+- All 11 public runtime files retain identical SHA-256 hashes after source extraction and assembly. Browser asset URLs, localStorage key and behavior are preserved.
+- Local syntax checks and 40 core/calculation/API/photo/build tests passed. Two new tests cover resolving HTML assets and repeatable build output. Full suite runs on GitHub Actions because local jsdom installation and loopback connections are restricted.
+- This is source/build verification, not a new browser rendering check.
+
 วันที่: 19 ตุลาคม 2026
 
 ผลล่าสุด: `npm run check` และ `npm test` ใช้ตรวจ **62 ข้อ** (core 13, DOM 32, photo helpers 3, API handler 7, local server 7) บน Node 24 รายละเอียดผลรอบเผยแพร่บันทึกใน commit/CI

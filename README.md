@@ -1,199 +1,62 @@
-# วันของคุณ · Your Day
+# วันของคุณ · Daily Routine
 
-เว็บแอปภาษาไทยสำหรับจัดการชีวิตประจำวัน บันทึกการดื่มน้ำ ตารางกิจกรรม การออกกำลังกาย อาหารและสารอาหาร พร้อมเช็กลิสต์ดูแลตัวเอง รองรับมือถือ iPad และคอมพิวเตอร์ บันทึกข้อมูลในเครื่อง พร้อมส่งออกและนำเข้า JSON
+เว็บบันทึกกิจวัตรส่วนตัวภาษาไทย รองรับคอมพิวเตอร์ มือถือ และ iPad
 
-ทำด้วย HTML / CSS / JavaScript ไม่มีไลบรารีภายนอกในตัวแอป ไม่มีบัญชีผู้ใช้หรือโฆษณา บันทึกทั่วไปอยู่ในเครื่อง ส่วนวิเคราะห์รูปอาหารเป็นบริการเสริมที่ต้องเปิดใช้ก่อน รูปและรายละเอียดจะส่งไปบริการที่ตั้งไว้และ OpenAI เฉพาะเมื่อคุณยืนยันและกดวิเคราะห์
+[เปิดเว็บ](https://mahawongsupawit125-coder.github.io/daily-routine/)
 
-## ถ่ายรูปอาหารและวิเคราะห์สารอาหาร
+## โครงสร้างที่ใช้งานจริง
 
-หน้า **อาหาร / สารอาหาร → ถ่ายรูป / เลือกรูปอาหาร** รองรับกล้องมือถือและรูปจากเครื่อง ใส่ปริมาณ วันที่ มื้อและเวลาที่กินได้ ผล AI เป็นประมาณการและต้องตรวจแก้แล้วกดบันทึกก่อนรวมยอดรายวัน ไม่เดาเวลาที่กินจากภาพ และยังกรอกอาหารเองได้เมื่อไม่มี AI
-
-**ต้องตั้งค่า backend และกุญแจบริการก่อนจึงจะวิเคราะห์ภาพจริงได้** เตรียม Cloudflare Worker และ local server endpoint ให้แล้ว ดู [คู่มือเปิดใช้ AI](FOOD-AI-SETUP.md) ห้ามใส่ API key ในหน้าเว็บหรือ GitHub รูปใช้วิเคราะห์ครั้งนั้น ไม่อยู่ในประวัติหรือ JSON; ผลที่ตรวจแล้วและเวลาเก็บแยกตามวัน
-
-## อัตลักษณ์ใหม่
-
-ใช้โลโก้แบบที่ 3 ที่ผู้ใช้เลือก: หัวใจและคลื่นทะเล พร้อมชื่อ “วันของคุณ” ธีมฟ้าน้ำทะเล (#087EA4 / #16B7CF) ไฟล์เวกเตอร์ `dist/icon.svg` ใช้เป็นสัญลักษณ์และ favicon ส่วน `dist/logo.svg` เป็นโลโก้พร้อมชื่อ พื้นหลังโปร่งใส ตัวอักษรไทยใช้ฟอนต์ของเครื่องเพื่อให้อ่านได้ชัด ไม่มีการโหลดฟอนต์ภายนอก
-
-ชื่อใหม่ไม่เปลี่ยนคีย์ข้อมูล `jai-daily.v1` เพื่อเก็บข้อมูลเดิมในเบราว์เซอร์ไว้
-
-## เปิดใช้งานในเครื่อง
-
-1. ดาวน์โหลดจาก GitHub: **Code → Download ZIP** แล้วแตกไฟล์ หรือ clone repository นี้
-2. ติดตั้ง [Node.js](https://nodejs.org/) เวอร์ชัน 24 ขึ้นไป
-3. บน Windows ดับเบิลคลิก **start.cmd** แล้วเปิด **http://localhost:4173**
-4. หรือเปิด Terminal ในโฟลเดอร์โปรเจกต์แล้วรัน:
-
-```sh
-node server.cjs
-```
-
-ไม่ต้องรัน `npm install` เพื่อใช้แอป ปิด server ด้วย Ctrl+C เปิดใช้ได้บนระบบที่มี Node เช่น Windows, macOS และ Linux
-
-ถ้ามี Python อยู่แล้ว ใช้วิธีนี้แทนได้:
-
-```sh
-python -m http.server 4173 --directory dist
-```
-
-ควรเปิดผ่าน server แทนการดับเบิลคลิก index.html เพื่อให้พื้นที่บันทึกและที่อยู่เว็บแน่นอน
-
-### เปิดจากมือถือหรือ iPad บน Wi-Fi เดียวกัน
-
-```sh
-node server.cjs --lan
-```
-
-ดู IPv4 ของคอมพิวเตอร์ (Windows ใช้ `ipconfig`) แล้วเปิด `http://IP-ของคอม:4173` จาก Safari หรือ Chrome บนเครื่องอื่น หาก Windows Firewall ถาม ให้เปิดเฉพาะเครือข่ายส่วนตัวที่คุณใช้ คอมต้องเปิด server ค้างไว้ วิธีสะดวกกว่าสำหรับใช้นอกบ้านคือเผยแพร่เป็น HTTPS ตามหัวข้อถัดไป
-
-**แต่ละเครื่องยังมีข้อมูลคนละชุด** แม้เปิดเว็บ URL เดียวกันบนมือถือและคอมก็ไม่ซิงก์ ให้ใช้ Settings → ส่งออก/นำเข้า JSON เพื่อย้ายข้อมูล
-
-## ใช้งานอะไรได้บ้าง
-
-ทุกหน้ามีตัวเลือกวันที่เดียวกัน ใช้ปุ่มวันก่อน/ถัดไป หรือปุ่มวันนี้ เมนู hamburger มุมซ้ายเปิดหรือพับ sidebar ได้ บนมือถือเปิดเป็นแผงทับ กด Escape หรือพื้นหลังเพื่อปิด
-
-| หน้า | การใช้งาน |
+| ส่วน | เนื้อหา |
 | --- | --- |
-| ภาพรวม | ยอดน้ำ กิจกรรม การเคลื่อนไหว อาหาร กราฟน้ำรายสัปดาห์ และเช็กลิสต์ดูแลตัวเอง |
-| ดื่มน้ำ | ติ๊ก/ยกเลิก แก้เวลาและปริมาณ เพิ่ม/ลบแก้ว ยอดลิตร/แก้ว/วง progress เปลี่ยนทันที |
-| ตารางชีวิตรายวัน | เพิ่ม/แก้/ลบกิจกรรม เปลี่ยน 4 สถานะ คัดลอกแผนจากวันอื่น |
-| ออกกำลังกาย | แผนสัปดาห์ A/B/พัก/active recovery แก้ท่า เซต การแบ่งเวลา และบันทึกทำแล้วต่อวัน |
-| อาหาร / สารอาหาร | เพิ่ม/แก้/ลบอาหาร พลังงาน โปรตีน คาร์บ ไขมัน ใยอาหาร โซเดียม และยอดรวม |
-| ดูแลตัวเอง | เช็กลิสต์แก้ไขได้ บันทึกทำแล้วและข้อความรายวัน |
-| ตั้งค่า | ชื่อ ค่าอ้างอิงน้ำ ส่งออก/นำเข้า JSON และคืนชุดเริ่มต้น |
+| [01_web_app](01_web_app) | โค้ดหน้าเว็บ แยก 9 หน้าตามเมนู พร้อม shared logic, styles และ icons |
+| [02_food_ai_api](02_food_ai_api) | API วิเคราะห์รูปอาหารและการตั้งค่า Cloudflare Worker |
+| [03_tests](03_tests) | ทดสอบสูตรคำนวณ การบันทึก นำเข้า/ส่งออก DOM API และไฟล์เผยแพร่ |
+| [docs](docs) | รายละเอียดฟีเจอร์ ขอบเขตโครงการ ผล QA และวิธีตั้งค่า Food AI |
+| [scripts](scripts) | Build, syntax checks, local server และตัวช่วย Windows |
+| [.github/workflows](.github/workflows) | ตรวจโค้ดและเผยแพร่ GitHub Pages อัตโนมัติ |
 
-### น้ำ
+### หน้าของเว็บ
 
-เริ่มต้นเวลา **08:00, 09:30, 11:00, 12:30, 14:00, 15:00, 16:30, 18:00, 20:00, 21:30, 23:00** ครั้งละ **300 มล.** รวมรายการ 3.3 ลิตร
+ภายใน `01_web_app/src/pages/` แบ่งตามหน้าที่มีอยู่จริง:
 
-- **3.3 ลิตรเป็นค่าอ้างอิง ไม่ใช่เป้าหมายบังคับ** แก้ที่ตั้งค่า หรือใส่ 0 เพื่อปิดค่าอ้างอิง
-- แต่ละวันเก็บสำเนารายการน้ำของตัวเอง การแก้ปริมาณวันหนึ่งไม่แก้ยอดอีกวัน
-- ปุ่ม “ใช้แผนนี้เป็นค่าเริ่มต้น” เปลี่ยนรายการของวันที่จะสร้างใหม่ ไม่เขียนทับวันเก่า
-- จำนวนแก้วคือจำนวนรายการที่ติ๊กจริง แต่ละแก้วมีปริมาตรต่างกันได้
+1. `01_dashboard` — ภาพรวม
+2. `02_body` — คำนวณร่างกาย
+3. `03_water` — ดื่มน้ำและเครื่องดื่ม
+4. `04_schedule` — ตารางชีวิต
+5. `05_workout` — ออกกำลังกาย
+6. `06_meals` — อาหารและสารอาหาร
+7. `07_self_care` — ดูแลตัวเอง
+8. `08_history` — ประวัติรายวัน
+9. `09_settings` — ตั้งค่าและสำรองข้อมูล
 
-### ตารางชีวิตและอาหารเริ่มต้น
+## รันและตรวจสอบ
 
-เลือก **19 ต.ค. 2026** หรือกดไปวันดังกล่าวจากหน้าตั้งค่า เพื่อดูข้อมูลจากบทสนทนา
-
-- ยืนยันมื้อเช้า EZYGO สลัดไข่ + ดีน่าโปรตีน 15g และมื้อกลางวันกะเพราหมูสับไข่ดาวแล้ว
-- นอน 04:00–12:00 เป็นเป้าหมายที่ยังไม่ยืนยัน สถานะ “ไม่ทราบ”
-- กิจกรรมอื่นเป็นแผน สถานะเริ่มต้น “ยังไม่ทำ” ปรับเป็น ทำแล้ว / ยังไม่ทำ / ทำไม่ได้ / ไม่ทราบ ได้
-- วันอื่นไม่มีตารางหรือมื้อที่ใส่ให้อัตโนมัติ คัดลอกตารางได้ โดยรายการที่คัดลอกเริ่ม “ยังไม่ทำ”
-
-ค่าฉลากที่ผู้ใช้ให้: EZYGO 240 kcal / โปรตีน 7g / คาร์บ 20g / ไขมัน 15g; DNA 160 kcal / โปรตีน 15g / ไขมัน 6g **ไม่ได้ระบุคาร์บ**
-
-กะเพราใส่ค่าตัวอย่าง **ประมาณการ** 650 kcal (ช่วงตัวอย่าง 550–800 kcal) และ macros ตัวอย่างที่แก้ได้ ไม่ใช่ข้อมูลฉลากหรือการวัดจริง
-
-**ยอดอาหารคือ “ประมาณการจากข้อมูลที่กรอก”** ไม่มีโควตาแคลอรี ช่องว่างหมายถึงไม่ทราบ และยอดจะแจ้งจำนวนรายการที่ยังไม่รวม ใส่ 0 เฉพาะเมื่อทราบว่าเป็นศูนย์
-
-### ออกกำลังกาย
-
-- จันทร์/พฤหัส: กลุ่ม A อก ไหล่ หน้าท้อง
-- อังคาร/ศุกร์: กลุ่ม B หลัง แขน ขา
-- พุธ/เสาร์: พัก
-- อาทิตย์: active recovery เช่น ตกเบ็ด ว่ายน้ำสบาย ๆ หรือเดินเล่นสบาย ๆ
-- แผนเริ่มต้น 16:30–18:00: วอร์ม 10 / เวท 50 / วิ่งหรือเดิน 25 / คูลดาวน์ 5 นาที
-- A/B มีตัวอย่าง 3 ท่าต่อส่วน × 3 เซต รวม 27 เซต และแสดงคำเตือนว่าช่วงเวท 50 นาทีอาจไม่พอ ลดท่าหรือปรับเวลาได้ ไม่ต้องทำครบ
-- แก้ท่าหรือวันในสัปดาห์มีผลกับแผนกลุ่มนั้นทั้งหมด ส่วนสถานะทำแล้วแยกตามวัน
-- ลบท่าหรือเช็กลิสต์ดูแลออกจากแผน จะเก็บชื่อและบันทึกของวันที่เคยทำไว้ในส่วน “ประวัติรายการ” ของวันนั้น ยังติ๊ก/ยกเลิกได้
-
-### ดูแลตัวเอง
-
-INGU สีฟ้า, มอยส์สีเขียวมิ้นต์, เจลแต้มสิวสีม่วงตามฉลาก, ดูแลเพลทจัดฟัน และ **กันแดดสีเขียวเป็นเพียงแผนเปลี่ยน ยังไม่ยืนยันใช้จริง** เช็กลิสต์ดูแลตัวเองเพิ่มหรือแก้ข้อความได้ รายการยังไม่ถือว่าทำแล้วจนกว่าจะติ๊กเอง
-
-ข้อความบันทึกการดูแลจะบันทึกอัตโนมัติเมื่อพิมพ์ ปุ่มบันทึกข้อความใช้ยืนยันซ้ำได้ การกดเช็กลิสต์หรือเปลี่ยนหน้าจึงไม่ทำให้ข้อความหาย
-
-## ข้อมูลอยู่ที่ไหน / สำรองอย่างไร
-
-### บันทึกและเปิดดูแต่ละวัน
-
-1. เลือกวันที่ด้านบน แล้วเพิ่มข้อมูลน้ำ ตารางชีวิต อาหาร การออกกำลังกาย และการดูแลของวันนั้น
-2. เมื่อเปลี่ยนข้อมูล แอปบันทึกอัตโนมัติ กด **บันทึกวันที่เลือก** เพื่อยืนยันซ้ำหรือเก็บวันที่ยังไม่มีรายการได้
-3. ใต้วันที่จะแสดง **บันทึกล่าสุด** เมื่อเก็บในเครื่องสำเร็จ หากบันทึกไม่ได้จะแสดงคำเตือน
-4. เปิดเมนู **ประวัติรายวัน** ดูสรุปแต่ละวัน กรองตามเดือน แล้วกด **เปิดดู / แก้ไข** เพื่อกลับไปวันนั้น รายการเก่าที่ยังไม่มีเวลาบันทึกยังเปิดได้
-
-การบันทึกวันหนึ่งไม่ล้างข้อมูลของวันอื่น เวลาบันทึกล่าสุดอยู่ในไฟล์สำรอง JSON ด้วย วันที่ที่แค่เปิดดูจะยังไม่แสดงเป็นบันทึกใหม่จนกว่าจะมีการบันทึกลงเครื่อง
-
-- ใช้ localStorage คีย์ `jai-daily.v1` แยกตามเบราว์เซอร์และ origin (protocol + hostname + port)
-- **ไม่ซิงก์ข้ามเครื่อง** เปลี่ยน URL เช่น localhost → IP หรือ → GitHub Pages จะเห็นพื้นที่ข้อมูลคนละชุด
-- โหมดส่วนตัวหรือการล้างข้อมูลเว็บไซต์อาจลบประวัติ ควรส่งออก JSON เป็นระยะ
-- Settings → **ส่งออก JSON** เก็บข้อมูลทุกวันและแผนที่แก้ไว้
-- Settings → **นำเข้า JSON** ตรวจรูปแบบ/เวอร์ชัน/ขนาดก่อน แล้วให้ยืนยัน การนำเข้าแทนที่ข้อมูลทั้งหมด ไม่ merge
-- ข้อมูลบันทึกอ่านไม่ได้จะไม่ถูกเขียนทับอัตโนมัติ มีปุ่มดาวน์โหลดต้นฉบับในตั้งค่า
-- ถ้าบันทึกไม่สำเร็จ เช่น storage เต็ม จะแสดงคำเตือน ข้อมูลยังอยู่ในความจำชั่วคราว ให้ส่งออกก่อนปิด
-- หากอีกแท็บแก้ข้อมูล จะแจ้งให้สำรองงานและรีเฟรช เพื่อลดการเขียนทับกัน
-- JSON เป็นข้อความธรรมดาและอาจมีข้อมูลส่วนตัว เก็บไว้กับตัวเอง ไม่อัปโหลดเข้าที่เก็บซอร์ส
-
-หากต้องการซิงก์อัตโนมัติในอนาคต ต้องเพิ่ม backend, บัญชีผู้ใช้ และระบบควบคุมสิทธิ์ การโฮสต์เว็บอย่างเดียวไม่เพิ่มการซิงก์
-
-## เผยแพร่ผ่าน GitHub Pages
-
-### อัปโหลดซอร์สขึ้น GitHub
-
-ในโฟลเดอร์ Git ที่มี `.git` อยู่ ให้รัน `git push origin main` หรือบน Windows ดับเบิลคลิก **upload-github.cmd** เพื่ออัปโหลด commit ที่เตรียมไว้ หาก Git ขอให้ลงชื่อเข้าใช้ ให้ทำผ่านหน้าต่างของ GitHub ตามปกติ อย่าวางรหัสผ่านหรือ token ลงในแชต ไฟล์ ZIP ไม่มีประวัติ `.git` จึงใช้ตัวอัปโหลดนี้ไม่ได้โดยตรง ต้องใช้โฟลเดอร์ Git ต้นฉบับหรือ clone repository ก่อน
-
-### เปิดเว็บออนไลน์
-
-เตรียม workflow `.github/workflows/pages.yml` ให้แล้ว เป็นการสั่งเผยแพร่ด้วยตัวเอง ไม่มีการ deploy ทุกครั้งที่ push
-
-1. เปิด repository → **Settings → Pages → Build and deployment → Source: GitHub Actions**
-2. เปิด **Actions → Publish GitHub Pages → Run workflow → main → Run workflow**
-3. รอขั้นตอนสีเขียว URL จริงจะแสดงในผลขั้นตอน deploy / หน้า Settings → Pages
-4. URL สำหรับชื่อ repository นี้โดยปกติคือ `https://mahawongsupawit125-coder.github.io/daily-routine/` ใช้ได้หลัง deploy สำเร็จเท่านั้น
-5. แก้เว็บแล้ว push ครั้งถัดไป รัน workflow เดิมเพื่อเผยแพร่เวอร์ชันใหม่
-
-อ้างอิง [เอกสาร GitHub Pages: custom workflows](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages) ตัวเว็บใช้ path แบบ relative จึงรองรับโฟลเดอร์ `/daily-routine/`
-
-การ push โค้ดขึ้น GitHub ยังไม่เท่ากับเปิดเว็บใช้งาน ต้องตั้ง Pages และ deploy ก่อน
-
-### โฮสต์แบบ static อื่น
-
-อัปโหลด **เนื้อหาภายใน `dist/`** ไปยัง static hosting ที่รองรับ HTTPS โดยมี `index.html` ที่รากของเว็บ ไม่ต้องมี build command หรือ server Node บนโฮสต์ ไม่ต้องตั้งค่าตัวแปรลับ
-
-หากเผยแพร่ repository สาธารณะ ข้อมูลตัวอย่างในซอร์สจะมองเห็นได้ ส่วนข้อมูลที่คุณกรอกภายหลังอยู่ในเบราว์เซอร์ ไม่ได้ถูกส่งกลับเข้าที่เก็บซอร์ส
-
-## สำหรับพัฒนาและทดสอบ
-
-ต้องมี Node 24+ และ npm สำหรับเครื่องมือทดสอบเท่านั้น:
+ใช้ Node.js 24 ขึ้นไป จากรากโปรเจกต์:
 
 ```sh
 npm ci
 npm run check
 npm test
+npm start
 ```
 
-jsdom เป็น **devDependency เท่านั้น** ใช้จำลองเอกสาร HTML แบบออฟไลน์ ทดสอบการกดปุ่ม/CRUD/storage/import แต่ไม่จำลอง layout จริง ชุดทดสอบ server เปิด HTTP เฉพาะ loopback ชั่วคราว
+เปิด `http://localhost:4173` หลังรัน `npm start` หรือใช้ `scripts/start.cmd` บน Windows คำสั่งทั้งหมดเรียก build ก่อนใช้ไฟล์ที่เผยแพร่
 
-ดูผลทดสอบและข้อจำกัดใน [QA.md](QA.md) โดยการจำลองความกว้างเมนูไม่ใช่การตรวจภาพหน้าจอมือถือจริง
+`npm run build` ประกอบ source ใน `01_web_app/` เป็น `dist/` โดยไม่เพิ่ม runtime dependency ไฟล์ใน dist/ เป็นผล build และไม่เก็บใน Git ให้แก้ source ตามหน้าที่รับผิดชอบแทน
 
-```text
-dist/              ไฟล์เว็บพร้อมโฮสต์ (index.html, styles.css, core.js, app.js, icon.svg)
-tests/             ชุดทดสอบ core, UI ผ่าน DOM และ local server
-server.cjs         เปิดเว็บในเครื่องโดยไม่ต้องติดตั้งแพ็กเกจ
-start.cmd          ตัวเปิดสำหรับ Windows
-upload-github.cmd  อัปโหลด commit จากโฟลเดอร์ Git บน Windows
-.github/workflows/ ตรวจสอบเมื่อ push และเผยแพร่ Pages ด้วยตัวเอง
-```
-# Self-care periods (2026-10-19 update)
+เปิดใน LAN: `npm start -- --lan` จากนั้นใช้ IP ของคอมพิวเตอร์บน Wi-Fi เดียวกัน
 
-The self-care page now has morning and afternoon sections with an Add button in each section. The editor can change the period, title, and notes. Existing items without a period remain under an unassigned section until the user selects a period. Existing IDs and daily completion records are preserved. Items remain shared across dates; completion remains per day and browser-local.
+## ข้อมูลและการเผยแพร่
 
-# Body calculator (2026-10-20)
+ข้อมูลยังบันทึกใน localStorage ของเบราว์เซอร์เดิม คีย์ `jai-daily.v1` และ URL เว็บไซต์เดิมคงไว้ การย้ายโฟลเดอร์ไม่ทำให้ข้อมูลซิงก์ข้ามเครื่อง ใช้ส่งออก/นำเข้า JSON เพื่อย้ายข้อมูลด้วยตนเอง
 
-The navigation order starts with Dashboard, Body Calculator, then Water. The Thai calculator updates BMI, adult BMI category, reference weight range, estimated resting energy (REE), and an approximate TDEE range as inputs change. Age, sex used by the equation, height in cm, weight in kg, and optional habitual activity are entered by the user; no measurements are prefilled from guesses.
+เมื่อเปลี่ยน source บน main ระบบจะ build, ตรวจ syntax และทดสอบก่อนเผยแพร่ GitHub Pages รองรับการรัน workflow ด้วยตนเองด้วย
 
-The Save button retains the latest profile under optional `settings.body` in `jai-daily.v1`, included in JSON export/import. The profile is shared across dates and remains browser-local. Editing inputs shows a draft until explicitly saved. This calculator does not set calorie goals, water goals, nutrition quotas, or weight-loss prescriptions.
+## เอกสาร
 
-BMI interpretation and weight reference range use CDC adult cutoffs (age 20+). Younger users see numeric BMI without adult classification. REE uses the simplified Mifflin-St Jeor equation and is displayed only for ages 20-78 with a supplied equation sex and a positive prediction. TDEE is a rough adaptation of REE times FAO/WHO/UNU PAL ranges (light 1.40-1.69, moderate 1.70-1.99, high 2.00-2.40); PAL was defined relative to BMR, so using estimated REE adds uncertainty. It is not a measured value or a statistical confidence interval. Sources and limitations are linked in the page.
+- [รายละเอียดฟีเจอร์และประวัติการพัฒนา](docs/FEATURES.md)
+- [ขอบเขตโครงการ](docs/PROJECT.md)
+- [ผลทดสอบและข้อจำกัด](docs/QA.md)
+- [ตั้งค่าการวิเคราะห์อาหารจากภาพ](docs/FOOD-AI-SETUP.md)
 
-GitHub Pages now also publishes changes to `dist/` pushed to `main`, after successful clean installation, syntax checks, and the full test suite. Manual workflow dispatch remains available.
-
-# Personal hydration links (2026-10-22)
-
-Saving body inputs updates the personal fluid reference on Water and the latest profile summary in Settings. Settings includes age, equation sex, height, weight, BMI interpretation, reference weight range, habitual activity, REE, TDEE, and the baseline fluid range with links back to edit. These are derived from the existing saved profile, not duplicate data.
-
-Water now records optional per-day `hydration` context: other non-alcoholic drinks actually consumed (ml), self-reported weather, actual minutes of sweaty activity, a user-chosen extra planning amount (ml), and an individual/clinician fluid-plan checkbox. Valid inputs autosave; blanks remain unknown rather than confirmed zero. Other drinks are added once to water checked in the existing slots. The baseline range uses 30-35 ml/kg/day as a rough adaptation of an NHS oral-fluid reference, limited in this app to ages 20-64 and BMI 18.5 to less than 30. The calculator suppresses generic values outside that scope or with an individual plan selected.
-
-Heat and activity generate contextual guidance. No fixed heat surcharge or guessed sweat-loss multiplier is applied. A user-entered extra amount is added once; if heat/activity is present but extra fluid is unknown, the displayed range is explicitly baseline-only. The remaining difference is shown only when other drinks have been quantified (including an explicitly entered zero), is floored at zero, and is not a dehydration diagnosis or an instruction to drink that entire difference. Water in food is not measured. The manual ring reference, saved daily water plans, and old history remain independent and unchanged.
-
-Sources: Royal Cornwall Hospitals NHS Trust Nutrition and Hydration for Adults Policy V1.0 (June 2025), NHS Water/drinks/hydration, and ACSM Exercise and Fluid Replacement (PMID 17277604). Links and calculation limitations are available inside the Water page. Data remains local to the browser and included in JSON backup/restore.
-
+API อาหารเป็นบริการเสริมและต้องตั้งค่าแยก หน้าเว็บและการบันทึกอาหารด้วยตนเองยังใช้ได้โดยไม่เปิดบริการนี้ ค่าร่างกาย พลังงาน และของเหลวเป็นค่าประมาณประกอบการวางแผน

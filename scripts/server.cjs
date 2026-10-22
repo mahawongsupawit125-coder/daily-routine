@@ -2,7 +2,7 @@ const http=require('node:http');
 const fs=require('node:fs');
 const path=require('node:path');
 const {Readable}=require('node:stream');
-const root=path.join(__dirname,'dist');
+const root=path.join(__dirname,'..','dist');
 const host=process.argv.includes('--lan')?'0.0.0.0':'127.0.0.1';
 const port=Number(process.env.PORT)||4173;
 const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.svg':'image/svg+xml','.json':'application/json; charset=utf-8'};
@@ -11,7 +11,7 @@ const localRateLimit={limit:async()=>{const now=Date.now();if(now-rateWindow>600
 const server=http.createServer(async(req,res)=>{
  let url;try{url=decodeURIComponent(new URL(req.url,'http://localhost').pathname);}catch{res.writeHead(400);return res.end('Bad request');}
  if(url==='/api/analyze-food'){
-  try{const {handleRequest}=await import('./api/worker.mjs');const method=req.method,options={method,headers:req.headers};if(!['GET','HEAD'].includes(method)){options.body=Readable.toWeb(req);options.duplex='half';}
+  try{const {handleRequest}=await import('../02_food_ai_api/worker.mjs');const method=req.method,options={method,headers:req.headers};if(!['GET','HEAD'].includes(method)){options.body=Readable.toWeb(req);options.duplex='half';}
    const response=await handleRequest(new Request('http://localhost/api/analyze-food',options),{...process.env,FOOD_RATE_LIMIT:localRateLimit});res.writeHead(response.status,Object.fromEntries(response.headers));return res.end(Buffer.from(await response.arrayBuffer()));
   }catch{res.writeHead(500,{'Content-Type':'application/json','Cache-Control':'no-store'});return res.end(JSON.stringify({error:'บริการวิเคราะห์ยังไม่พร้อม กรุณาตรวจการตั้งค่า'}));}
  }

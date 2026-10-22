@@ -7,7 +7,7 @@
 - เว็บ: https://mahawongsupawit125-coder.github.io/daily-routine/
 - GitHub: https://github.com/mahawongsupawit125-coder/daily-routine
 - คู่มือ AI: [FOOD-AI-SETUP.md](FOOD-AI-SETUP.md)
-- คู่มือใช้งานฉบับเต็ม: [README.md](README.md)
+- คู่มือใช้งานฉบับเต็ม: [README.md](../README.md)
 - รายละเอียดการตรวจสอบ: [QA.md](QA.md)
 
 ## ภาพรวม

@@ -4,7 +4,12 @@ on:
   push:
     branches: [main]
     paths:
-      - 'dist/**'
+      - '01_web_app/**'
+      - '02_food_ai_api/**'
+      - '03_tests/**'
+      - 'scripts/**'
+      - 'package.json'
+      - 'package-lock.json'
       - '.github/workflows/pages.yml'
 permissions:
   contents: read

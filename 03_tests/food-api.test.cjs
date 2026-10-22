@@ -1,6 +1,6 @@
 const {test}=require('node:test');
 const assert=require('node:assert/strict');
-const api=()=>import('../api/worker.mjs');
+const api=()=>import('../02_food_ai_api/worker.mjs');
 const origin='https://mahawongsupawit125-coder.github.io';
 const env=()=>({OPENAI_API_KEY:'server-only-test-key',FOOD_ACCESS_TOKEN:'a'.repeat(32),FOOD_ALLOWED_ORIGINS:origin,FOOD_RATE_LIMIT:{limit:async()=>({success:true})}});
 const image='data:image/jpeg;base64,/9j/2Q==';

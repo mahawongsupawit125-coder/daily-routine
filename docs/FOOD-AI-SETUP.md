@@ -30,7 +30,7 @@ GitHub Pages โฮสต์หน้าเว็บแบบ static ส่ว�
 
 ```sh
 npx wrangler login
-npx wrangler deploy --config api/wrangler.jsonc
+npx wrangler deploy --config 02_food_ai_api/wrangler.jsonc
 ```
 
 ทำขั้นตอนเข้าสู่ระบบและยอมรับเงื่อนไขบัญชีด้วยตัวเองตามหน้าของผู้ให้บริการ การเผยแพร่ครั้งแรกยังวิเคราะห์ไม่ได้จนกว่าจะมี Secret ครบ
@@ -38,13 +38,13 @@ npx wrangler deploy --config api/wrangler.jsonc
 เพิ่ม Secret สองค่า ใช้คำสั่งที่ถามค่าแบบซ่อน ไม่ใส่ค่าจริงลงคำสั่งหรือไฟล์ใน Git:
 
 ```sh
-npx wrangler secret put OPENAI_API_KEY --config api/wrangler.jsonc
-npx wrangler secret put FOOD_ACCESS_TOKEN --config api/wrangler.jsonc
+npx wrangler secret put OPENAI_API_KEY --config 02_food_ai_api/wrangler.jsonc
+npx wrangler secret put FOOD_ACCESS_TOKEN --config 02_food_ai_api/wrangler.jsonc
 ```
 
 หรือเข้า Cloudflare → Workers & Pages → Worker ของคุณ → Settings → Variables and Secrets → Add → เลือก **Secret** และเพิ่มสองชื่อนี้
 
-ไฟล์ `api/wrangler.jsonc` ตั้งค่าไว้ดังนี้:
+ไฟล์ `02_food_ai_api/wrangler.jsonc` ตั้งค่าไว้ดังนี้:
 
 | ค่า | ความหมาย |
 | --- | --- |
@@ -73,7 +73,7 @@ https://ชื่อ-worker.ชื่อบัญชี.workers.dev/api/analyze-
 
 ## ใช้กับ server ในเครื่อง (ทางเลือก)
 
-`server.cjs` รองรับ `/api/analyze-food` เช่นเดียวกับ Worker โดยอ่าน `OPENAI_API_KEY`, `FOOD_ACCESS_TOKEN`, `FOOD_ALLOWED_ORIGINS` และ `OPENAI_MODEL` จาก environment ของ process ตั้งค่าในเครื่องอย่างเป็นส่วนตัวก่อนเริ่ม server ไม่มีการอ่านไฟล์ `.env` อัตโนมัติ
+`scripts/server.cjs` รองรับ `/api/analyze-food` เช่นเดียวกับ Worker โดยอ่าน `OPENAI_API_KEY`, `FOOD_ACCESS_TOKEN`, `FOOD_ALLOWED_ORIGINS` และ `OPENAI_MODEL` จาก environment ของ process ตั้งค่าในเครื่องอย่างเป็นส่วนตัวก่อนเริ่ม server ไม่มีการอ่านไฟล์ `.env` อัตโนมัติ
 
 เปิดเว็บจาก `http://localhost:4173` ให้ `FOOD_ALLOWED_ORIGINS` เป็น `http://localhost:4173` แล้วตั้ง URL ในหน้าเว็บเป็น `http://localhost:4173/api/analyze-food` หากใช้ `127.0.0.1` หรือ LAN ต้องระบุ origin ที่ใช้จริง (หลายค่าคั่นด้วย comma) รหัสและกุญแจยังไม่ควรใส่ในแชตหรือ commit
 
@@ -100,3 +100,4 @@ https://ชื่อ-worker.ชื่อบัญชี.workers.dev/api/analyze-
 - [Cloudflare: Secrets](https://developers.cloudflare.com/workers/configuration/secrets/)
 - [Cloudflare: Rate limiting](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/)
 - [GitHub: What is GitHub Pages?](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages)
+

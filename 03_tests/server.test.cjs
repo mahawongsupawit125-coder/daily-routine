@@ -5,7 +5,7 @@ const path=require('node:path');
 let child,base;
 before(async()=>{
  const port=44000+Math.floor(Math.random()*10000);base='http://127.0.0.1:'+port;
- child=spawn(process.execPath,[path.join(__dirname,'../server.cjs')],{env:{...process.env,PORT:String(port)},stdio:['ignore','pipe','pipe'],windowsHide:true});
+ child=spawn(process.execPath,[path.join(__dirname,'../scripts/server.cjs')],{env:{...process.env,PORT:String(port)},stdio:['ignore','pipe','pipe'],windowsHide:true});
  await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(Error('Server did not start')),10000);child.once('error',reject);child.once('exit',code=>{if(code)reject(Error('Server exit '+code));});child.stdout.on('data',data=>{if(data.toString().includes('Jai Daily:')){clearTimeout(timer);resolve();}});});
 });
 after(()=>child?.kill());
