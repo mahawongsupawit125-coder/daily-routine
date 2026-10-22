@@ -61,5 +61,6 @@
 
 - Added tests for body-profile references, latest measurements, other drinks counted once, unknown-versus-zero handling, heat/activity flags, a single user-selected adjustment, safe applicability, clinician plans, nonnegative differences, separate dates, import validation, and legacy data preservation.
 - Added DOM tests for Water/Settings links, updated body measurements appearing in both pages, daily input reload, automatic saving before water toggles, invalid-input protection, and unavailable/individual-plan states.
-- Local core/calculation/API/photo tests and syntax checks are run separately from the full GitHub Actions suite. No actual-device visual rendering verification is claimed.
+- Local syntax checks and 38 core/calculation/API/photo tests passed. The local full suite is limited by unavailable jsdom and EACCES connecting to loopback. GitHub Actions Check app run 39717474004 completed clean dependency installation, syntax checks, and all 83 tests successfully before release.
+- No actual-device visual rendering verification was performed for this feature.
 
