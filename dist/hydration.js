@@ -1,0 +1,48 @@
+/* Personal fluid references and latest body profile: no network requests or automatic calorie/water quotas. */
+(()=>{'use strict';
+ const C=window.Jai,e=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const liters=ml=>(ml/1000).toLocaleString('en-US',{minimumFractionDigits:1,maximumFractionDigits:2});
+ const number=(value,digits=0)=>value.toLocaleString('en-US',{minimumFractionDigits:digits,maximumFractionDigits:digits});
+ const range=r=>r?`${liters(r.min)}–${liters(r.max)} ลิตร`:'—';
+ const reasonText=reason=>reason==='profile-required'?'ยังไม่มีข้อมูลร่างกายที่บันทึกไว้ กรุณากรอกข้อมูลก่อน':reason==='individual-plan'?'ควรใช้แผนปริมาณน้ำเฉพาะบุคคล จึงไม่แสดงตัวเลขจากสูตรทั่วไปสำหรับข้อมูลชุดนี้':'';
+ const linkBody='<button class="btn soft" data-page="body">ไปคำนวณ / แก้ข้อมูลร่างกาย</button>';
+ function contextText(h,r){
+  const parts=[];
+  parts.push(h.weather==='unknown'?'ยังไม่ระบุอากาศ':h.weather==='hot'?'อากาศร้อนหรืออบอ้าว: ความต้องการน้ำอาจเพิ่มตามเหงื่อ':'อากาศสบาย / อยู่ในที่เย็น');
+  parts.push(h.activityMinutes===null?'ยังไม่ระบุกิจกรรม':h.activityMinutes>0?`กิจกรรมที่มีเหงื่อ ${h.activityMinutes} นาที: ควรพิจารณาการเสียเหงื่อจริง`:'ระบุว่าไม่มีกิจกรรมที่มีเหงื่อในวันนี้');
+  if(r.flags.includes('adjustment-unknown'))parts.push('ช่วงที่แสดงยังเป็นค่าพื้นฐาน ยังไม่ได้ประเมินน้ำเพิ่มเติมสำหรับเหงื่อ');
+  else if(h.extraMl!==null)parts.push(`น้ำปรับเพิ่มที่คุณระบุ ${number(h.extraMl)} มล. รวมครั้งเดียวแล้ว`);
+  return parts.join(' · ');
+ }
+ function results(profile,h,waterMl){
+  const r=C.hydrationEstimate(profile,h,waterMl),incomplete=r.flags.includes('adjustment-unknown');
+  return `<div class="hydration-stats"><div><span class="small muted">${incomplete?'ช่วงพื้นฐาน · ยังไม่รวมการปรับจากเหงื่อ':'ช่วงของเหลวอ้างอิงต่อวัน'}</span><strong id="hydrationReference">${range(r.reference)}</strong></div><div><span class="small muted">${h.otherDrinksMl===null?'ยอดที่ทราบ · ยังไม่รวมเครื่องดื่มอื่น':'น้ำและเครื่องดื่มอื่นที่บันทึกรวม'}</span><strong id="hydrationKnownTotal">${liters(r.knownTotalMl)} ลิตร</strong></div><div><span class="small muted">ส่วนต่างเทียบช่วงอ้างอิงจากที่บันทึก</span><strong id="hydrationRemaining">${range(r.remaining)}</strong></div></div>
+   <p id="hydrationReason" class="small">${e(reasonText(r.reason))}</p>${!profile?linkBody:''}
+   ${r.base?`<p class="small muted">น้ำหนักล่าสุด ${number(profile.weight,1)} กก. × 30–35 มล./กก. = ช่วงพื้นฐาน ${range(r.base)}${h.extraMl!==null?` · ปรับเพิ่มตามที่ระบุ ${liters(h.extraMl)} ลิตร`:''}</p>`:''}
+   <p id="hydrationContext" class="small">${e(contextText(h,r))}</p>${h.otherDrinksMl===null?'<p class="small muted">ใส่ปริมาณเครื่องดื่มอื่น หรือใส่ 0 เมื่อยืนยันว่าไม่มี จึงจะแสดงส่วนต่างได้</p>':''}
+   <p class="small muted">เป็นค่าอ้างอิงเพื่อวางแผน ไม่ใช่คำสั่งว่าต้องดื่มให้ครบ ส่วนต่างไม่ใช่การวัดภาวะขาดน้ำ ตัวเลขนี้นับน้ำและเครื่องดื่มรวมกัน ไม่ใช่น้ำเปล่าที่ต้องดื่มเพิ่มทั้งหมด</p>`;
+ }
+ function render(profile,context,waterMl){
+  const h=context||C.hydrationDefaults();
+  const field=(title,name,max,step,hint)=>`<label class="field"><span>${title}</span><input name="${name}" type="number" inputmode="decimal" min="0" max="${max}" step="${step}" value="${e(h[name]??'')}" placeholder="ยังไม่ระบุ"><small>${hint}</small></label>`;
+  return `<section class="card hydration-card"><div class="card-header"><div><p class="eyebrow">YOUR PERSONAL HYDRATION</p><h2>น้ำอ้างอิงสำหรับคุณ</h2><p>เชื่อมจากข้อมูลร่างกายล่าสุด · อากาศ กิจกรรม และเครื่องดื่มแยกตามวันที่เลือก</p></div></div><div id="hydrationResults" aria-live="polite">${results(profile,h,waterMl)}</div>
+   <details class="hydration-details" open><summary>อากาศ กิจกรรม และเครื่องดื่มวันนี้</summary><form id="hydrationForm"><div class="body-fields">
+   ${field('เครื่องดื่มอื่นที่ดื่มแล้วรวม (มล.)','otherDrinksMl',10000,1,'เช่น นม ชา กาแฟ น้ำผลไม้ · ไม่รวมน้ำที่ติ๊กในตาราง และไม่รวมแอลกอฮอล์')}
+   <label class="field"><span>อากาศที่คุณพบวันนี้ (เลือกเอง)</span><select name="weather">${[['unknown','ยังไม่ทราบ'],['normal','อากาศสบาย / อยู่ในที่เย็น'],['hot','ร้อน / อบอ้าว / เสียเหงื่อจากอากาศ']].map(([key,title])=>`<option value="${key}" ${h.weather===key?'selected':''}>${title}</option>`).join('')}</select><small>เลือกตามสภาพจริง ไม่ดึงอากาศหรือเดาตำแหน่งของคุณ</small></label>
+   ${field('กิจกรรมที่มีเหงื่อในวันนี้ (นาที)','activityMinutes',720,1,'รวมระยะเวลาที่ทำจริงวันนี้ · ใส่ 0 เมื่อไม่มี · แยกจากระดับกิจกรรมประจำในข้อมูลร่างกาย')}
+   ${field('น้ำที่คุณวางแผนปรับเพิ่มจากอากาศ/เหงื่อ (มล.)','extraMl',3000,1,'เว้นว่างเมื่อยังไม่ทราบ หรือใส่ 0 เมื่อไม่ปรับเพิ่ม · อย่านับการเสียเหงื่อช่วงเดียวกันซ้ำทั้งอากาศและออกกำลังกาย')}
+   </div><label class="hydration-check"><input type="checkbox" name="restricted" ${h.restricted?'checked':''}><span>ฉันมีข้อจำกัดน้ำหรือแผนเฉพาะจากแพทย์ / ภาวะที่ต้องปรับน้ำเฉพาะบุคคล เช่น ตั้งครรภ์ ให้นม โรคไตหรือหัวใจ</span></label><p id="hydrationError" class="error" role="alert"></p><button type="submit" class="btn primary">บันทึกข้อมูลน้ำวันนี้</button><p id="hydrationSaveStatus" class="small muted" role="status">ข้อมูลที่กรอกถูกต้องจะบันทึกอัตโนมัติ · เว้นว่างหมายถึงยังไม่ทราบ</p></form></details>
+   <details class="hydration-details"><summary>วิธีประมาณและข้อจำกัด</summary><p class="small">ใช้ช่วงของเหลวทางปาก 30–35 มล./กก./วันจากนโยบายโภชนาการ NHS เป็นค่าอ้างอิงพื้นฐานอย่างหยาบ ไม่ใช่สูตรที่ยืนยันความต้องการเฉพาะคน หน้านี้จำกัดตัวเลขอัตโนมัติไว้ที่ผู้ใหญ่อายุ 20–64 ปีและ BMI 18.5 ถึงน้อยกว่า 30 ผู้ที่อยู่นอกขอบเขตหรือมีแผนจากแพทย์ควรใช้คำแนะนำเฉพาะบุคคล</p><p class="small">นม ชา กาแฟ และเครื่องดื่มอื่นมีส่วนช่วยให้ได้รับน้ำ จึงนำปริมาตรที่กรอกมารวมโดยไม่หักน้ำออกเพราะคาเฟอีน อาหารก็มีน้ำ แต่หน้านี้ไม่ได้วัดส่วนนั้น ส่วนต่างจึงอาจมากกว่าที่ต้องดื่มจริง ค่าบนวงแหวนยังเป็นค่าอ้างอิงที่คุณตั้งเอง ไม่ถูกเขียนทับด้วยสูตร</p><p class="small">อากาศร้อนและกิจกรรมเพิ่มความแตกต่างของการเสียเหงื่อ จึงแสดงบริบทและให้คุณระบุแผนปรับเพิ่ม โดยไม่เดาปริมาตรคงที่จากอุณหภูมิหรือจำนวนนาที หากยังเว้นน้ำเพิ่มไว้ ระบบจะแสดงชัดว่ายังไม่รวมการปรับจากเหงื่อ ดื่มกระจายระหว่างวันและปรับตามภาวะจริง</p><div class="body-sources"><a href="https://doclibrary-rcht.cornwall.nhs.uk/GET/d10368900" target="_blank" rel="noopener noreferrer">NHS: Nutrition and Hydration Policy 2025</a><a href="https://www.nhs.uk/live-well/eat-well/food-guidelines-and-food-labels/water-drinks-nutrition/" target="_blank" rel="noopener noreferrer">NHS: เครื่องดื่มและอากาศ</a><a href="https://pubmed.ncbi.nlm.nih.gov/17277604/" target="_blank" rel="noopener noreferrer">ACSM: การชดเชยน้ำตามการเสียเหงื่อ</a></div></details></section>`;
+ }
+ function read(form){const f=new FormData(form),value=k=>String(f.get(k)??'').trim(),quantity=k=>value(k)===''?null:Number(value(k));return {otherDrinksMl:quantity('otherDrinksMl'),weather:value('weather'),activityMinutes:quantity('activityMinutes'),extraMl:quantity('extraMl'),restricted:f.get('restricted')==='on'};}
+ function update(form,profile,waterMl){
+  try{if(!form.checkValidity())throw Error('ตรวจปริมาณและระยะเวลาให้อยู่ในช่วงที่ระบุ');const h=read(form);C.hydrationEstimate(profile,h,waterMl);document.getElementById('hydrationResults').innerHTML=results(profile,h,waterMl);document.getElementById('hydrationError').textContent='';return h;}catch(err){document.getElementById('hydrationError').textContent=err.message;document.getElementById('hydrationSaveStatus').textContent='ยังไม่ได้บันทึกการแก้ไขที่ไม่ถูกต้อง';return null;}
+ }
+ function settings(profile,context){
+  if(!profile)return `<section class="card" id="bodySettingsSummary"><h2>ข้อมูลร่างกายที่บันทึกไว้</h2><p>ยังไม่มีข้อมูลร่างกาย กรุณาบันทึกที่หน้าคำนวณร่างกายเพื่อเชื่อมค่าอ้างอิงน้ำ</p>${linkBody}</section>`;
+  const m=C.bodyMetrics(profile),h=C.hydrationEstimate(profile,context),sex={male:'ชาย',female:'หญิง','':'ยังไม่ระบุ'},activity={'':'ยังไม่ระบุ',light:'นั่งเป็นส่วนใหญ่ / กิจกรรมเบา',moderate:'เคลื่อนไหวหรือออกกำลังกายสม่ำเสมอ',high:'ใช้แรงหรือกิจกรรมหนักหลายชั่วโมง'},category={underweight:'ต่ำกว่าเกณฑ์',healthy:'อยู่ในเกณฑ์อ้างอิง',overweight:'น้ำหนักเกินเกณฑ์',obesity1:'ภาวะอ้วน ระดับ 1',obesity2:'ภาวะอ้วน ระดับ 2',obesity3:'ภาวะอ้วน ระดับ 3'};
+  const rows=[['อายุ',`${profile.age} ปี`],['เพศที่ใช้ในสมการ',sex[profile.sex]],['ส่วนสูง',`${number(profile.height,1)} ซม.`],['น้ำหนัก',`${number(profile.weight,1)} กก.`],['BMI',`${number(m.bmi,2)} กก./ม² · ${category[m.category]||'ไม่แปลผลด้วยเกณฑ์ผู้ใหญ่'}`],['ช่วงน้ำหนักอ้างอิง',m.weightRange?`${number(m.weightRange.min,2)} ถึง < ${number(m.weightRange.max,2)} กก.`:'—'],['กิจกรรมประจำ',activity[profile.activity]],['พลังงานขณะพัก (REE)',m.ree===null?'—':`${number(m.ree)} kcal/วัน`],['พลังงานรวม (TDEE)',m.tdee?`${number(m.tdee.min)}–${number(m.tdee.max)} kcal/วัน`:'—'],['ของเหลวอ้างอิงพื้นฐาน',h.base?range(h.base):'ใช้แผนเฉพาะบุคคล']];
+  return `<section class="card" id="bodySettingsSummary"><h2>ข้อมูลร่างกายล่าสุดของคุณ</h2><p class="small muted">ข้อมูลชุดเดียวกับหน้าคำนวณร่างกาย · บันทึกแล้วจะอัปเดตหน้านี้และหน้าดื่มน้ำ</p><dl class="profile-summary">${rows.map(([title,value])=>`<div><dt>${title}</dt><dd>${e(value)}</dd></div>`).join('')}</dl><p class="small muted">น้ำอ้างอิงเป็นค่าประมาณสำหรับผู้ใหญ่ทั่วไป ไม่รวมแผนปรับตามเหงื่อเฉพาะวัน ดูบริบทและข้อจำกัดของวันนี้ที่หน้าดื่มน้ำ</p><div class="actions">${linkBody}<button class="btn soft" data-page="water">ดูน้ำอ้างอิงวันนี้</button></div></section>`;
+ }
+ window.JaiHydration={render,read,update,settings};
+})();

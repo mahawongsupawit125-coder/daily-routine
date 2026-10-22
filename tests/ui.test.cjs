@@ -5,6 +5,27 @@ const path=require('node:path');
 const {JSDOM,VirtualConsole}=require('jsdom');
 const C=require('../dist/core.js');
 const KEY='jai-daily.v1';
+test('saved body data drives fluid references and settings without overwriting water history',t=>{
+ const s=C.createState();s.settings.body={age:30,sex:'male',height:175,weight:70,activity:'moderate'};C.day(s,'2026-10-22').water=['w0'];
+ const a=setup(t,{raw:JSON.stringify(s)});a.date('2026-10-22');a.page('water');assert.match(a.q('#hydrationReference').textContent,/2.1.*2.45/);
+ for(const [name,value] of Object.entries({otherDrinksMl:'300',weather:'hot',activityMinutes:'60',extraMl:'400'}))a.q(`#hydrationForm [name="${name}"]`).value=value;
+ a.q('#hydrationForm').requestSubmit();assert.equal(a.stored().days['2026-10-22'].hydration.otherDrinksMl,300);assert.match(a.q('#hydrationKnownTotal').textContent,/0.6/);assert.match(a.q('#hydrationReference').textContent,/2.5.*2.85/);
+ assert.equal(a.stored().settings.waterReference,3300);assert.deepEqual(a.stored().days['2026-10-22'].water,['w0']);
+ a.page('settings');assert.match(a.q('#bodySettingsSummary').textContent,/70/);assert.match(a.q('#bodySettingsSummary').textContent,/22.86/);assert.ok(a.q('#bodySettingsSummary [data-page="body"]'));
+ a.page('body');a.q('#bodyForm [name="weight"]').value='65';a.q('#bodyForm').requestSubmit();a.page('water');assert.match(a.q('#hydrationReference').textContent,/2.35.*2.68/);a.page('settings');assert.match(a.q('#bodySettingsSummary').textContent,/65/);
+ const b=setup(t,{raw:JSON.stringify(a.stored())});b.date('2026-10-22');b.page('water');assert.equal(b.q('#hydrationForm [name="otherDrinksMl"]').value,'300');b.date('2026-10-23');assert.equal(b.q('#hydrationForm [name="otherDrinksMl"]').value,'');assert.match(b.q('#hydrationRemaining').textContent,/—/);
+});
+test('missing profile and a clinician plan avoid misleading numeric hydration instructions',t=>{
+ const a=setup(t);a.page('water');assert.match(a.q('#hydrationReference').textContent,/—/);assert.ok(a.q('#content [data-page="body"]'));a.page('settings');assert.match(a.q('#bodySettingsSummary').textContent,/ยังไม่มี/);
+ const s=C.createState();s.settings.body={age:30,sex:'female',height:165,weight:60,activity:''};C.day(s,'2026-10-22').hydration={otherDrinksMl:0,weather:'hot',activityMinutes:30,extraMl:200,restricted:true};
+ const b=setup(t,{raw:JSON.stringify(s)});b.date('2026-10-22');b.page('water');assert.equal(b.q('#hydrationReference').textContent,'—');assert.match(b.q('#hydrationReason').textContent,/เฉพาะบุคคล/);
+});
+test('hydration drafts autosave valid input before water toggles and invalid input cannot poison later saves',t=>{
+ const s=C.createState();s.settings.body={age:30,sex:'male',height:175,weight:70,activity:''};
+ const a=setup(t,{raw:JSON.stringify(s)});a.date('2026-10-22');a.page('water');const field=a.q('#hydrationForm [name="otherDrinksMl"]');field.value='450';field.dispatchEvent(new a.w.Event('input',{bubbles:true}));
+ a.click('[data-action="water-toggle"][data-id="w0"]');assert.equal(a.q('#hydrationForm [name="otherDrinksMl"]').value,'450');assert.match(a.q('#hydrationKnownTotal').textContent,/0.75/);
+ const invalid=a.q('#hydrationForm [name="otherDrinksMl"]');invalid.value='-1';invalid.dispatchEvent(new a.w.Event('input',{bubbles:true}));assert.ok(a.q('#hydrationError').textContent);assert.equal(a.stored().days['2026-10-22'].hydration.otherDrinksMl,450);a.click('[data-action="water-toggle"][data-id="w1"]');assert.doesNotThrow(()=>C.parseImport(JSON.stringify(a.stored())));
+});
 test('body menu sits below dashboard and above water; live values save and reload without changing nutrition',t=>{
  const a=setup(t),nav=a.all('#navigation [data-page]').map(x=>x.dataset.page);
  assert.deepEqual(nav.slice(0,3),['dashboard','body','water']);a.page('body');assert.equal(a.q('#dailySave').hidden,true);
@@ -58,6 +79,7 @@ function setup(t,{width=1440,raw=null,blocked=false}={}){
  w.eval(fs.readFileSync(path.join(__dirname,'../dist/core.js'),'utf8'));
  w.eval(fs.readFileSync(path.join(__dirname,'../dist/food-photo.js'),'utf8'));
  w.eval(fs.readFileSync(path.join(__dirname,'../dist/body-page.js'),'utf8'));
+ w.eval(fs.readFileSync(path.join(__dirname,'../dist/hydration.js'),'utf8'));
  w.eval(fs.readFileSync(path.join(__dirname,'../dist/app.js'),'utf8'));
  t.after(()=>{assert.deepEqual(errors,[]);dom.window.close();});
  const q=s=>doc.querySelector(s),all=s=>[...doc.querySelectorAll(s)];

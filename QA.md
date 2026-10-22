@@ -57,3 +57,9 @@
 - Local syntax and 31 core/API/photo/calculation tests pass. Full local testing is limited by npm directory permissions, unavailable jsdom, and EACCES on loopback server requests. GitHub Actions Check app run 39407020562 completed clean installation, syntax checks, and all 73 tests successfully before release.
 - No phone/tablet/desktop browser visual verification has been performed for this page in this session.
 
+# Personal hydration verification (2026-10-22)
+
+- Added tests for body-profile references, latest measurements, other drinks counted once, unknown-versus-zero handling, heat/activity flags, a single user-selected adjustment, safe applicability, clinician plans, nonnegative differences, separate dates, import validation, and legacy data preservation.
+- Added DOM tests for Water/Settings links, updated body measurements appearing in both pages, daily input reload, automatic saving before water toggles, invalid-input protection, and unavailable/individual-plan states.
+- Local core/calculation/API/photo tests and syntax checks are run separately from the full GitHub Actions suite. No actual-device visual rendering verification is claimed.
+

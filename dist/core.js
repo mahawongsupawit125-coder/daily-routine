@@ -36,6 +36,21 @@
   const factors=bodyActivityRanges[p.activity];
   return {bmi,category,weightRange:adult?{min:18.5*square,max:25*square}:null,ree,tdee:ree!==null&&factors?{min:ree*factors[0],max:ree*factors[1]}:null};
  }
+ const hydrationDefaults=()=>({otherDrinksMl:null,weather:'unknown',activityMinutes:null,extraMl:null,restricted:false});
+ function validateHydration(h){
+  const quantity=(v,max)=>v===null||(typeof v==='number'&&Number.isFinite(v)&&v>=0&&v<=max);
+  if(!h||typeof h!=='object'||Array.isArray(h)||!quantity(h.otherDrinksMl,10000)||!quantity(h.extraMl,3000)||!quantity(h.activityMinutes,720)||(h.activityMinutes!==null&&!Number.isInteger(h.activityMinutes))||!['unknown','normal','hot'].includes(h.weather)||typeof h.restricted!=='boolean')throw Error('ข้อมูลน้ำไม่ถูกต้อง: เครื่องดื่มอื่น 0–10,000 มล. น้ำเพิ่ม 0–3,000 มล. กิจกรรม 0–720 นาที หรือเว้นว่างเมื่อยังไม่ทราบ');
+  return h;
+ }
+ function hydrationEstimate(profile,h=hydrationDefaults(),waterMl=0){
+  validateHydration(h);if(typeof waterMl!=='number'||!Number.isFinite(waterMl)||waterMl<0||waterMl>100000)throw Error('ยอดน้ำที่บันทึกไม่ถูกต้อง');
+  const flags=[];if(h.otherDrinksMl===null)flags.push('drinks-unknown');if(h.weather==='unknown')flags.push('weather-unknown');if(h.weather==='hot')flags.push('hot');if(h.activityMinutes===null)flags.push('activity-unknown');if(h.activityMinutes>0)flags.push('active');if((h.weather==='hot'||h.activityMinutes>0)&&h.extraMl===null)flags.push('adjustment-unknown');
+  const knownTotalMl=waterMl+(h.otherDrinksMl??0);let reason='',base=null;
+  if(!profile)reason='profile-required';else{const metrics=bodyMetrics(profile);if(h.restricted||profile.age<20||profile.age>=65||metrics.bmi<18.5||metrics.bmi>=30)reason='individual-plan';else base={min:profile.weight*30,max:profile.weight*35};}
+  const reference=base?{min:base.min+(h.extraMl??0),max:base.max+(h.extraMl??0)}:null;
+  const remaining=reference&&h.otherDrinksMl!==null?{min:Math.max(0,reference.min-knownTotalMl),max:Math.max(0,reference.max-knownTotalMl)}:null;
+  return {base,reference,knownTotalMl,remaining,reason,flags};
+ }
  function validate(s,legacy=false){
   const fail=()=>{throw Error('รูปแบบข้อมูลไม่ถูกต้อง หรือไฟล์เป็นเวอร์ชันที่ไม่รองรับ');};
   const str=(x,n=2000)=>typeof x==='string'&&x.length<=n;
@@ -52,6 +67,7 @@
   for(const k of ['A','B','rest','active']){const w=s.workouts[k];if(!w||!str(w.title,200)||!items(w.exercises,x=>str(x.name,200)&&num(x.sets,100)&&Number.isInteger(x.sets)&&x.sets>0&&str(x.reps,200)&&str(x.note)))fail();}
   if(!items(s.phases,x=>str(x.name,100)&&num(x.minutes,500))||!items(s.care,x=>str(x.title,200)&&careCategory(x)&&str(x.note))||!s.days||typeof s.days!=='object'||Array.isArray(s.days)||Object.keys(s.days).length>10000)fail();
   for(const [date,d] of Object.entries(s.days)){
+   if(d?.hydration!==undefined)validateHydration(d.hydration);
    if(d?.savedAt!==undefined&&(typeof d.savedAt!=='string'||!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(d.savedAt)||!Number.isFinite(Date.parse(d.savedAt))))fail();
    if(d?.careArchive!==undefined&&!items(d.careArchive,x=>str(x.title,200)&&careCategory(x)&&str(x.note)))fail();
    if(d?.workoutArchive!==undefined&&!items(d.workoutArchive,x=>str(x.name,200)&&num(x.sets,100)&&Number.isInteger(x.sets)&&x.sets>0&&str(x.reps,200)&&str(x.note)&&['A','B','rest','active'].includes(x.group)))fail();
@@ -81,6 +97,6 @@
   return s;
  }
  function parseImport(raw){if(typeof raw!=='string'||raw.length>5000000)throw Error('ไฟล์ใหญ่เกิน 5 MB');return validate(removeLegacyAnimalData(validate(JSON.parse(raw),true)));}
- const api={uid,clone,createState,day,waterStats,nutrition,workoutFor,parseImport,validate,validDate,statuses,bodyMetrics};
+ const api={uid,clone,createState,day,waterStats,nutrition,workoutFor,parseImport,validate,validDate,statuses,bodyMetrics,hydrationDefaults,hydrationEstimate};
  if(typeof module!=='undefined')module.exports=api;else root.Jai=api;
 })(globalThis);

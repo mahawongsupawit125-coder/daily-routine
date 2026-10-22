@@ -187,3 +187,13 @@ BMI interpretation and weight reference range use CDC adult cutoffs (age 20+). Y
 
 GitHub Pages now also publishes changes to `dist/` pushed to `main`, after successful clean installation, syntax checks, and the full test suite. Manual workflow dispatch remains available.
 
+# Personal hydration links (2026-10-22)
+
+Saving body inputs updates the personal fluid reference on Water and the latest profile summary in Settings. Settings includes age, equation sex, height, weight, BMI interpretation, reference weight range, habitual activity, REE, TDEE, and the baseline fluid range with links back to edit. These are derived from the existing saved profile, not duplicate data.
+
+Water now records optional per-day `hydration` context: other non-alcoholic drinks actually consumed (ml), self-reported weather, actual minutes of sweaty activity, a user-chosen extra planning amount (ml), and an individual/clinician fluid-plan checkbox. Valid inputs autosave; blanks remain unknown rather than confirmed zero. Other drinks are added once to water checked in the existing slots. The baseline range uses 30-35 ml/kg/day as a rough adaptation of an NHS oral-fluid reference, limited in this app to ages 20-64 and BMI 18.5 to less than 30. The calculator suppresses generic values outside that scope or with an individual plan selected.
+
+Heat and activity generate contextual guidance. No fixed heat surcharge or guessed sweat-loss multiplier is applied. A user-entered extra amount is added once; if heat/activity is present but extra fluid is unknown, the displayed range is explicitly baseline-only. The remaining difference is shown only when other drinks have been quantified (including an explicitly entered zero), is floored at zero, and is not a dehydration diagnosis or an instruction to drink that entire difference. Water in food is not measured. The manual ring reference, saved daily water plans, and old history remain independent and unchanged.
+
+Sources: Royal Cornwall Hospitals NHS Trust Nutrition and Hydration for Adults Policy V1.0 (June 2025), NHS Water/drinks/hydration, and ACSM Exercise and Fluid Replacement (PMID 17277604). Links and calculation limitations are available inside the Water page. Data remains local to the browser and included in JSON backup/restore.
+
