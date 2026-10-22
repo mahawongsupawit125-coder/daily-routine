@@ -1,0 +1,46 @@
+/* Health editorial theme; existing routes, forms and saved data are retained. */
+:root{--bg:#f8fbfd;--ink:#183e59;--muted:#627b8d;--accent:#1678be;--accent-dark:#105c94;--light:#eaf5fc;--border:#e0ebf2;--radius:14px;--shadow:0 8px 32px #234d7107}
+body{background:var(--bg)}
+.btn{border-radius:7px;padding:11px 20px}.btn.primary{box-shadow:0 5px 14px #1678be16}.btn.soft{background:#edf6fc}
+.card{border-radius:14px;box-shadow:var(--shadow)}
+.card-header h2{font-size:19px;letter-spacing:-.4px}.icon-tile{border-radius:10px}
+main{max-width:1320px;padding:34px 40px 12px}
+.topbar{height:52px;background:#fff;border-bottom:1px solid var(--border);padding:0 max(40px,calc((100vw - 1240px)/2));font-size:12px}
+.header-right .avatar{display:none}.header-left{color:var(--muted)}
+.page-heading{gap:28px;margin-bottom:30px;padding:16px 0 22px;border-bottom:1px solid var(--border)}
+#pageTitle{font-size:36px;line-height:1.5;letter-spacing:-1px}#pageSubtitle{max-width:600px;line-height:1.8}
+.eyebrow{font-size:10px;letter-spacing:2.1px;color:var(--accent)}
+.date-tools{padding:8px;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 5px 20px #183e5904}
+.date-label{border:0;padding:0 4px}.date-tools .icon-btn{color:var(--accent)}
+.welcome{min-height:330px;padding:44px 48px;margin-bottom:0;border:0;border-radius:14px;background:linear-gradient(110deg,#e8f4fc 0%,#eef8fd 55%,#d8edf9 100%);gap:24px;isolation:isolate}
+.welcome:after{content:'';position:absolute;width:390px;height:390px;border-radius:50%;right:-100px;top:-140px;border:60px solid #ffffff40;z-index:-1}
+.welcome h2{font-size:clamp(29px,3.4vw,46px);line-height:1.45;letter-spacing:-1.3px;font-weight:700;max-width:650px}
+.welcome p{font-size:14px;line-height:1.9;max-width:470px;margin-top:14px}.welcome .eyebrow{font-size:10px;letter-spacing:2px;color:#397ea9;margin:0 0 16px}
+.hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px;position:relative;z-index:1}.hero-actions .btn.soft{background:#fff;color:var(--accent-dark);border:1px solid #cadfeb}
+.wellness-art{width:310px;max-width:36%;height:auto;flex-shrink:0;position:relative;z-index:0;filter:drop-shadow(0 12px 18px #407dad10)}
+.quick-care{position:relative;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));background:#fff;border:1px solid var(--border);border-radius:12px;margin:20px 0 40px;box-shadow:0 10px 25px #264f7105;overflow:hidden}
+.quick-care button{border:0;border-right:1px solid var(--border);background:#fff;padding:22px 18px;text-align:left;display:flex;align-items:center;gap:14px;min-width:0}.quick-care button:last-child{border-right:0}.quick-care .icon{width:25px;height:25px;color:var(--accent)}.quick-care strong{display:block;font-size:14px;color:var(--ink)}.quick-care small{font-size:11px;color:var(--muted)}.quick-care button:hover{background:var(--light)}
+.home-section-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin:0 0 20px}.home-section-heading h2{font-size:25px;letter-spacing:-.5px}.home-section-heading p{font-size:12px;margin-top:5px}.home-section-heading>.small{color:var(--accent);text-align:right}
+.stats{gap:18px;margin-bottom:30px}.stat{padding:24px;background:#fff}.stat-value{font-size:31px;margin:15px 0 5px}.stat-top span{font-size:12px}.stat .icon-tile{background:#edf6fc;color:var(--accent)}
+.dashboard-grid{gap:24px}.stack{gap:24px}.water-card{background:#f1f8fd;border-color:#dbeaf5}
+.dashboard-feature-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;margin:34px 0 0}.feature-link{display:flex;align-items:center;gap:22px;min-height:138px;width:100%;padding:28px;border:1px solid var(--border);border-radius:12px;background:#fff;text-align:left;color:var(--ink)}.feature-link>span{flex:1;min-width:0}.feature-link h3{font-size:18px;margin-bottom:6px}.feature-link p{font-size:12px;line-height:1.8}.feature-link>.icon{width:38px;height:38px;color:var(--accent)}.feature-link>span:last-child{flex:0;font-size:24px;color:var(--accent)}
+.body-intro,.self-care-banner,.food-launch{background:#eef7fd}.hydration-card{background:#fff}.hydration-stats>div{border-radius:10px;background:#eff7fc}.hydration-stats strong{color:var(--accent-dark)}
+.footer{border-top:1px solid var(--border);margin-top:36px;padding:24px 0 15px}.daily-save-actions{padding-bottom:22px}.toast{left:50%}
+@media(min-width:901px){
+ #sidebar{position:relative;inset:auto;width:100%;padding:20px max(40px,calc((100vw - 1240px)/2)) 0;display:flex;flex-direction:row;align-items:center;gap:0 20px;flex-wrap:wrap;border-right:0;border-bottom:1px solid var(--border);overflow:visible;transform:none}
+ .brand{margin:0 0 16px;padding:0;flex:1}.brand strong{font-size:22px}.brandmark{width:42px;height:42px}.brand .brand-copy>span{font-size:9px;letter-spacing:2px}
+ .nav-caption,.side-note,.local-note{display:none}.side-bottom{margin:0 0 16px;padding:0;order:2}.side-bottom .nav-item{margin:0;min-height:44px;border:1px solid var(--border);padding:9px 16px}
+ #navigation{display:flex;align-items:center;gap:3px;order:3;width:100%;overflow-x:auto;scrollbar-width:thin;min-width:0;padding-bottom:10px}
+ #navigation .nav-item{width:auto;flex:0 0 auto;font-size:12px;gap:7px;padding:10px 13px;border-radius:7px;margin:0;min-height:42px}#navigation .nav-item .icon{width:17px;height:17px}.nav-item.active{background:#eaf4fb;color:var(--accent-dark)}.nav-item.active:after{display:none}
+ #appShell,body.nav-collapsed #appShell{margin-left:0}body.nav-collapsed #sidebar{transform:none}#menuButton{display:none}
+}
+@media(max-width:1200px) and (min-width:901px){.page-heading{flex-direction:row;align-items:center}main{padding:28px 30px 12px}.welcome{padding:38px}.wellness-art{width:260px}.quick-care button{padding:20px 14px;gap:10px}.quick-care strong{font-size:13px}.quick-care small{font-size:10px}}
+@media(max-width:900px){
+ main{padding:24px 24px 12px}.topbar{height:64px;padding:0 24px}.page-heading{align-items:flex-start;flex-direction:column;padding-top:8px}#pageTitle{font-size:32px}.welcome{min-height:300px;padding:32px}.welcome h2{font-size:34px}.wellness-art{width:240px;max-width:35%}.quick-care{grid-template-columns:repeat(2,minmax(0,1fr));margin-bottom:30px}.quick-care button:nth-child(2){border-right:0}.quick-care button:nth-child(-n+2){border-bottom:1px solid var(--border)}.stats{gap:14px}.stat{padding:20px}.stat-value{font-size:27px}.toast{left:50%}
+}
+@media(max-width:700px){
+ main{padding:20px 16px 8px}.topbar{height:64px;padding:0 16px}.page-heading{gap:16px;margin-bottom:20px}#pageTitle{font-size:29px}.date-tools{width:100%;padding:5px;gap:0}.date-label{flex:1;min-width:0}.date-label input{min-width:0;width:100%}.date-tools .btn{padding:9px 12px;margin-left:4px}
+ .welcome{min-height:0;display:block;padding:28px 24px 24px;overflow:hidden}.welcome h2{font-size:31px;max-width:100%;letter-spacing:-.9px}.welcome p{font-size:12px;max-width:100%}.welcome .eyebrow{font-size:9px;letter-spacing:1.5px}.hero-actions{gap:8px;margin-top:20px}.hero-actions .btn{font-size:12px;padding:10px 13px}.wellness-art{display:block;max-width:100%;width:230px;margin:16px auto -18px;opacity:1}.welcome:after{width:280px;height:280px;right:-110px;top:30px;border-width:35px}
+ .quick-care{margin:16px 0 30px}.quick-care button{padding:17px 12px;gap:10px}.quick-care strong{font-size:12px}.quick-care small{font-size:10px}.quick-care .icon{width:22px;height:22px}.home-section-heading h2{font-size:23px}.home-section-heading>.small{display:none}.stats{gap:12px;margin-bottom:24px}.stat{padding:18px 15px}.stat-top span{font-size:11px}.stat .icon-tile{width:30px;height:30px}.stat-value{font-size:27px}.stat-desc{font-size:10px;line-height:1.8}.dashboard-feature-links{grid-template-columns:1fr;gap:14px;margin-top:24px}.feature-link{padding:22px;min-height:120px}.feature-link h3{font-size:17px}.feature-link>.icon{width:32px;height:32px}.card{border-radius:12px}.footer{gap:6px}.daily-save-actions .btn{font-size:12px}
+}
+@media print{#sidebar,.topbar,.quick-care,.hero-actions,.dashboard-feature-links,.daily-save-actions{display:none!important}main{max-width:none;padding:0}.welcome{min-height:0;padding:20px}.wellness-art{display:none}.page-heading{padding:0 0 12px}#content{flex:none}}

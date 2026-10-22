@@ -13,7 +13,7 @@ test('local server serves Thai app with security headers',async()=>{
  const r=await fetch(base+'/');assert.equal(r.status,200);assert.match(r.headers.get('content-type'),/text\/html/);assert.match(r.headers.get('content-security-policy'),/script-src 'self'/);assert.equal(r.headers.get('x-content-type-options'),'nosniff');assert.match(await r.text(),/lang="th"/);
 });
 test('all local runtime assets are served',async()=>{
- for(const file of ['app.js','core.js','body-page.js','hydration.js','body.css','styles.css','icon.svg']){const r=await fetch(base+'/'+file);assert.equal(r.status,200,file);assert.ok((await r.text()).length>100);}
+ for(const file of ['app.js','core.js','body-page.js','hydration.js','theme.css','body.css','styles.css','icon.svg']){const r=await fetch(base+'/'+file);assert.equal(r.status,200,file);assert.ok((await r.text()).length>100);}
 });
 test('source files and Git metadata are not exposed by local server',async()=>{
  for(const file of ['README.md','server.cjs','package.json','.git/config','not-found'])assert.equal((await fetch(base+'/'+file)).status,404,file);
