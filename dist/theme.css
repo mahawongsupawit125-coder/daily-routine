@@ -1,4 +1,7 @@
 /* Health editorial theme; existing routes, forms and saved data are retained. */
+.mobile-menu-trigger{display:none}
+@media(max-width:900px){.mobile-menu-trigger{display:inline-flex;margin:12px 0 0 16px}}
+@media print{.mobile-menu-trigger{display:none!important}}
 :root{--bg:#f8fbfd;--ink:#183e59;--muted:#627b8d;--accent:#1678be;--accent-dark:#105c94;--light:#eaf5fc;--border:#e0ebf2;--radius:14px;--shadow:0 8px 32px #234d7107}
 body{background:var(--bg)}
 .btn{border-radius:7px;padding:11px 20px}.btn.primary{box-shadow:0 5px 14px #1678be16}.btn.soft{background:#edf6fc}
