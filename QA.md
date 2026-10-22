@@ -64,3 +64,10 @@
 - Local syntax checks and 38 core/calculation/API/photo tests passed. The local full suite is limited by unavailable jsdom and EACCES connecting to loopback. GitHub Actions Check app run 39717474004 completed clean dependency installation, syntax checks, and all 83 tests successfully before release.
 - No actual-device visual rendering verification was performed for this feature.
 
+# Health editorial theme verification (2026-10-22)
+
+- Restyled the shared header, page headings, cards and forms with a blue/white health theme. Dashboard adds a larger hero, category links and feature links using existing routes. Personal data and calculation logic are unchanged.
+- Desktop header uses the existing 900px mobile drawer boundary. Independent source review found no important issues with resize, inert state, navigation or daily save handlers.
+- GitHub Actions Check app run 39719465639 completed installation, syntax checks and all 83 tests successfully. Static asset coverage includes theme.css.
+- Reference image OCR was available, but image pixels could not be opened in this environment. This is a structural adaptation in a chosen blue/white palette, not a verified pixel match. Headless Edge did not produce a screenshot, so no actual browser or device visual verification is claimed.
+
