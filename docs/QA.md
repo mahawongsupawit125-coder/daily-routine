@@ -6,6 +6,7 @@
 - All 11 public runtime files retain identical SHA-256 hashes after source extraction and assembly. Browser asset URLs, localStorage key and behavior are preserved.
 - Local syntax checks and 40 core/calculation/API/photo/build tests passed. Two new tests cover resolving HTML assets and repeatable build output. Full suite runs on GitHub Actions because local jsdom installation and loopback connections are restricted.
 - This is source/build verification, not a new browser rendering check.
+- GitHub Actions Check app run 39722730493 verified a clean checkout, built all public assets, checked 18 scripts and passed all 85 tests before release.
 
 วันที่: 19 ตุลาคม 2026
 
