@@ -308,3 +308,27 @@ test('all topics render their existing forms inside the overview and can return 
  a.click('.overview-topic-body');
  assert.equal(a.q('#bodyForm [name="weight"]').value,'81');
 });
+
+test('glass number controls respect min max and decimal steps and keep live calculations working',t=>{
+ const a=setup(t);a.page('body');
+ const input=a.q('#bodyForm [name="age"]');
+ assert.ok(input.closest('.number-control'));
+ input.value='120';input.closest('.number-control').querySelector('[data-number-step="1"]').click();assert.equal(input.value,'120');
+ input.value='1';input.closest('.number-control').querySelector('[data-number-step="-1"]').click();assert.equal(input.value,'1');
+ const height=a.q('#bodyForm [name="height"]');height.value='170';height.closest('.number-control').querySelector('[data-number-step="1"]').click();assert.equal(height.value,'170.1');
+ assert.equal(a.w.localStorage.getItem(KEY),null);
+});
+test('number controls work inside editors without submitting the form',t=>{
+ const a=setup(t);a.page('water');a.click('[data-action="water-add"]');
+ const input=a.q('#editorForm [name="ml"]');assert.ok(input.closest('.number-control'));
+ input.value='300';input.closest('.number-control').querySelector('[data-number-step="1"]').click();
+ assert.equal(Number(input.value),301);assert.equal(a.q('#editor').open,true);
+});
+test('number controls dispatch normal input and change events and preserve date isolation',t=>{
+ const a=setup(t);a.date('2026-10-22');a.page('water');
+ const input=a.q('#hydrationForm [name="otherDrinksMl"]');let inputs=0,changes=0;
+ input.addEventListener('input',()=>inputs++);input.addEventListener('change',()=>changes++);
+ input.value='0';input.closest('.number-control').querySelector('[data-number-step="1"]').click();
+ assert.equal(inputs,1);assert.equal(changes,1);assert.equal(a.stored().days['2026-10-22'].hydration.otherDrinksMl,Number(input.value));
+ a.date('2026-10-23');assert.equal(a.q('#hydrationForm [name="otherDrinksMl"]').value,'');
+});

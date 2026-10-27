@@ -46,6 +46,31 @@
 /* @include src/pages/05_workout/page.js */
 /* @include src/pages/07_self_care/page.js */
 /* @include src/pages/09_settings/page.js */
+ function enhanceNumberInputs(){
+  document.querySelectorAll('input[type="number"]').forEach(input=>{
+   if(input.closest('.number-control'))return;
+   const label=input.getAttribute('aria-label')||input.labels?.[0]?.querySelector('span:not(.body-input-icon)')?.textContent.trim()||input.name||'ตัวเลข';
+   if(!input.hasAttribute('aria-label')&&!input.hasAttribute('aria-labelledby'))input.setAttribute('aria-label',label);
+   const group=document.createElement('number-field');group.className='number-control';
+   const button=(direction,text)=>{const b=document.createElement('button');b.type='button';b.className='number-step';b.dataset.numberStep=direction;b.textContent=text;b.setAttribute('aria-label',(direction<0?'ลด ':'เพิ่ม ')+label);b.disabled=input.disabled||input.readOnly;return b;};
+   input.before(group);group.append(button(-1,'−'),input,button(1,'+'));
+  });
+ }
+ document.addEventListener('click',ev=>{
+  const button=ev.target.closest('[data-number-step]');if(!button)return;
+  ev.preventDefault();
+  const input=button.closest('.number-control').querySelector('input');
+  if(input.matches(':disabled')||input.readOnly)return;
+  const previous=input.value,direction=Number(button.dataset.numberStep);
+  if(input.step==='any'){
+   const min=input.min===''?-Infinity:Number(input.min),max=input.max===''?Infinity:Number(input.max);
+   input.value=String(Math.min(max,Math.max(min,(input.valueAsNumber||0)+direction)));
+  }else if(direction>0)input.stepUp();else input.stepDown();
+  input.focus({preventScroll:true});
+  if(input.value!==previous){input.dispatchEvent(new Event('input',{bubbles:true}));input.dispatchEvent(new Event('change',{bubbles:true}));}
+ });
+ const numberObserver=new MutationObserver(enhanceNumberInputs);
+ numberObserver.observe(document.body,{childList:true,subtree:true});
  function render(){
   const previousPanel=$('.overview-panel-content'),panelScroll=previousPanel?.scrollTop||0,panelTopic=previousPanel?.dataset.topic;
   document.body.classList.toggle('overview-view',page!=='account');
@@ -55,7 +80,7 @@
   const html={dashboard,body:()=>window.JaiBody.render(state.settings.body,!storageBlocked),water:waterPage,schedule:schedulePage,workout:workoutPage,meals:mealsPage,care:carePage,settings:settingsPage,history:dailyHistory}[page]();
   $('#content').innerHTML=(storageBlocked?`<div class="storage-banner">${notice(e(storageIssue)+' <button class="text-btn" data-page="settings">จัดการ / สำรองข้อมูล</button>','error')}</div>`:'')+(page==='dashboard'?html:dashboard(html+historySection()));
   if(panelTopic===page&&$('.overview-panel-content'))$('.overview-panel-content').scrollTop=panelScroll;
-  $('#dailySave').hidden=page==='settings'||page==='history'||page==='body';$('.date-tools').hidden=page==='body';if(page==='body')window.JaiBody.update($('#bodyForm'));updateSaveStatus();
+  $('#dailySave').hidden=page==='settings'||page==='history'||page==='body';$('.date-tools').hidden=page==='body';if(page==='body')window.JaiBody.update($('#bodyForm'));updateSaveStatus();enhanceNumberInputs();
  }
  function historySection(){
   if(page==='care'){
@@ -89,7 +114,7 @@
   if(type==='copy'){title='คัดลอกตารางจากวันที่อื่น';fields=field('วันที่ต้นทาง','source',date==='2026-10-19'?shift(date,-1):'2026-10-19','date','required min="2000-01-01" max="2100-12-31"')+notice('เพิ่มกิจกรรมจากต้นทางต่อท้ายตารางวันนี้ โดยเริ่มสถานะเป็น “ยังไม่ทำ” ทั้งหมด ไม่คัดลอกสถานะทำแล้ว');}
   if(type==='reset'){title='ยืนยันคืนข้อมูลเริ่มต้น';fields=notice('ข้อมูลปัจจุบันทั้งหมดในแอปนี้จะถูกแทนที่ รวมประวัติทุกวัน แนะนำให้ส่งออก JSON ก่อน','warning')+`<label class="check-field"><input name="confirm" type="checkbox" required>ฉันสำรองแล้ว / ต้องการเริ่มใหม่</label>`;}
   if(type==='import'){title='ตรวจแล้ว · พร้อมนำเข้า';fields=notice(`พบข้อมูล ${Object.keys(editorImport.days).length} วัน · แผนน้ำเริ่มต้น ${editorImport.water.length} รายการ<br>การนำเข้าจะแทนที่ข้อมูลทั้งหมดในเครื่องนี้`,'warning')+`<label class="check-field"><input name="confirm" type="checkbox" required>ยืนยันแทนที่ข้อมูลปัจจุบัน</label>`;}
-  $('#editorTitle').textContent=title;$('#editorFields').innerHTML=fields;$('#formError').textContent='';$('#deleteItem').hidden=!deletable;$('#deleteItem').textContent='ลบรายการ';$('#editor').showModal();
+  $('#editorTitle').textContent=title;$('#editorFields').innerHTML=fields;$('#formError').textContent='';$('#deleteItem').hidden=!deletable;$('#deleteItem').textContent='ลบรายการ';enhanceNumberInputs();$('#editor').showModal();
  }
  let editorImport=null;
  function upsert(list,value){const at=list.findIndex(x=>x.id===value.id);if(at<0)list.push(value);else list[at]=value;}
