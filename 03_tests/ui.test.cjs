@@ -268,3 +268,20 @@ test('failed cleanup write preserves unrelated in-memory records and reports uns
  const s=C.createState(),d=C.day(s,'2026-10-20');s.care.push({id:'retired',category:'pet',title:'ดูแลกระต่าย',note:''});d.water=['w0'];d.care=['retired','c0'];
  const raw=JSON.stringify(s),a=setup(t,{raw,blocked:true});assert.equal(a.w.localStorage.getItem(KEY),raw);a.date('2026-10-20');a.page('water');assert.match(a.q('.ring-number').textContent,/0.3/);assert.match(a.q('#saveState').textContent,/ยังไม่ได้บันทึกถาวร/);a.page('care');assert.doesNotMatch(a.q('#content').textContent,/กระต่าย|กระแต/);assert.ok(a.q('[data-action="care-toggle"][data-id="c0"]'));
 });
+
+test('overview links cover every topic and update the selected date without saving a visit',t=>{
+ const a=setup(t);
+ assert.equal(a.w.document.body.classList.contains('overview-view'),true);
+ assert.deepEqual(a.all('.overview-topics [data-page]').map(x=>x.dataset.page),['body','water','schedule','workout','meals','care','history']);
+ a.date('2026-10-22');
+ assert.equal(a.q('.overview-topic-water small').textContent,'0.0 ลิตร · 0 แก้ววันนี้');
+ assert.equal(a.w.localStorage.getItem(KEY),null);
+ a.click('.overview-topic-water');
+ assert.equal(a.w.document.body.classList.contains('overview-view'),false);
+ assert.ok(a.q('#hydrationForm'));
+ a.click('[data-action="water-toggle"][data-id="w0"]');
+ a.page('dashboard');
+ assert.match(a.q('.overview-topic-water small').textContent,/0.3 ลิตร/);
+ a.date('2026-10-23');
+ assert.match(a.q('.overview-topic-water small').textContent,/0.0 ลิตร/);
+});

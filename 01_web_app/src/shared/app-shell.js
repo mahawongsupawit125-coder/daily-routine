@@ -47,6 +47,7 @@
 /* @include src/pages/07_self_care/page.js */
 /* @include src/pages/09_settings/page.js */
  function render(){
+  document.body.classList.toggle('overview-view',page==='dashboard');
   $('#selectedDate').value=date;$('#pageTitle').textContent=routes[page][1];$('#pageSubtitle').textContent=routes[page][2];$('#breadcrumb').textContent=routes[page][0];$('#eyebrow').textContent=page==='dashboard'?'YOUR EVERYDAY, A LITTLE BETTER':'YOUR DAY / '+page.toUpperCase();
   $('#navigation').innerHTML=Object.keys(routes).filter(k=>k!=='settings').map(k=>`<button class="nav-item ${k===page?'active':''}" data-page="${k}" ${k===page?'aria-current="page"':''}>${icon(k==='history'?'clock':k==='body'?'care':k)}${routes[k][0]}</button>`).join('');
   $('#settingsNav').innerHTML=icon('settings')+'ตั้งค่า';$('#settingsNav').classList.toggle('active',page==='settings');$('#settingsNav').setAttribute('aria-current',page==='settings'?'page':'false');

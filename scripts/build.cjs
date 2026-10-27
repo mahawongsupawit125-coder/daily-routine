@@ -13,7 +13,8 @@ const assets={
  'assets/styles/theme.css':'theme.css',
  'assets/icons/icon.svg':'icon.svg',
  'assets/icons/logo.svg':'logo.svg',
- 'assets/icons/logo-v2.png':'logo-v2.png'
+ 'assets/icons/logo-v2.png':'logo-v2.png',
+ 'assets/images/overview-forest.png':'overview-forest.png'
 };
 function build(output=path.join(root,'dist')){
  fs.mkdirSync(output,{recursive:true});
