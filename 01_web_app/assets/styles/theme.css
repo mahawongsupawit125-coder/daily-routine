@@ -63,7 +63,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 @media(min-width:901px){#sidebar .brand-logo{width:170px;height:49px}}
 
 /* Hallmark · pre-emit critique: P4 H5 E4 S5 R4 V4 */
-:root{--overview-paper:#fbfaf6;--overview-glass:#fffffff0;--overview-shade:#141b2314;--overview-wash:#ffffffb8}
+:root{--overview-paper:#fbfaf6;--overview-glass:#fffffff0;--overview-shade:#141b2314;--overview-wash:#ffffff33;--overview-fade:#ffffff70}
 html,body{overflow-x:clip}
 .overview-view main{height:calc(100dvh - 115px);min-height:0;max-width:1488px;padding:12px 24px 6px}
 .overview-view .page-heading{flex:0 0 auto;margin:0 0 10px;padding:0;border:0;justify-content:flex-end}
@@ -131,7 +131,7 @@ html,body{overflow-x:clip}
 /* Let the nature backdrop show through the topic area and its large sections. */
 .overview-panel-content .card:not(.body-input-card):not(.body-metric):not(.stat){background:transparent;border-color:transparent;box-shadow:none}
 
-.overview-hero.has-panel:before{background:linear-gradient(90deg,var(--overview-paper) 0%,var(--overview-paper) 12%,var(--overview-wash) 72%,transparent 100%)}
+.overview-hero.has-panel:before{background:linear-gradient(90deg,var(--overview-paper) 0%,var(--overview-fade) 24%,var(--overview-wash) 50%,transparent 78%)}
 .overview-panel-content{scrollbar-width:thin;scrollbar-color:var(--accent) transparent}
 .overview-panel-header .icon-btn{background:var(--overview-glass);border-radius:50%}
 
