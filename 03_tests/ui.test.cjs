@@ -300,7 +300,7 @@ test('all topics render their existing forms inside the overview and can return 
   assert.equal(a.all('.overview-topics .overview-topic').length,7);
   assert.ok(a.q('.overview-topic-'+route+'[aria-current="page"]'));
  }
- a.click('.overview-panel-header [data-page="dashboard"]');
+ a.click('.header-actions [data-page="dashboard"]');
  assert.equal(a.q('.overview-panel'),null);
  assert.ok(a.q('.overview-copy'));
  a.page('body');
