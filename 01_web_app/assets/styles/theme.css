@@ -30,11 +30,11 @@ main{max-width:1320px;padding:34px 40px 12px}
 .body-intro,.self-care-banner,.food-launch{background:#f1f9f8}.hydration-card{background:#fff}.hydration-stats>div{border-radius:10px;background:#f1f9f8}.hydration-stats strong{color:var(--accent-dark)}
 .footer{border-top:1px solid var(--border);margin-top:36px;padding:24px 0 15px}.daily-save-actions{padding-bottom:22px}.toast{left:50%}
 @media(min-width:901px){
- #sidebar{position:relative;inset:auto;width:100%;padding:20px max(40px,calc((100vw - 1240px)/2)) 0;display:flex;flex-direction:row;align-items:center;gap:0 20px;flex-wrap:wrap;border-right:0;border-bottom:1px solid var(--border);overflow:visible;transform:none}
- .brand{margin:0 0 16px;padding:0;flex:1}.brand strong{font-size:22px}.brandmark{width:42px;height:42px}.brand .brand-copy>span{font-size:9px;letter-spacing:2px}
- .nav-caption,.side-note,.local-note{display:none}.side-bottom{margin:0 0 16px;padding:0;order:2}.side-bottom .nav-item{margin:0;min-height:44px;border:1px solid var(--border);padding:9px 16px}
- #navigation{display:flex;align-items:center;gap:3px;order:3;width:100%;overflow-x:auto;scrollbar-width:thin;min-width:0;padding-bottom:10px}
- #navigation .nav-item{width:auto;flex:0 0 auto;font-size:12px;gap:7px;padding:10px 13px;border-radius:7px;margin:0;min-height:42px}#navigation .nav-item .icon{width:17px;height:17px}.nav-item.active{background:#f1f9f8;color:var(--accent-dark)}.nav-item.active:after{display:none}
+ #sidebar{position:relative;inset:auto;width:calc(100% - 48px);max-width:1440px;margin:20px auto 0;padding:12px 20px;display:flex;flex-direction:row;align-items:center;gap:20px;flex-wrap:nowrap;border:1px solid var(--border);border-radius:24px;box-shadow:var(--shadow);overflow:visible;transform:none}
+ .brand{margin:0;padding:0;flex:0 0 auto}.brand strong{font-size:22px}.brandmark{width:42px;height:42px}.brand .brand-copy>span{font-size:9px;letter-spacing:2px}
+ .nav-caption,.side-note,.local-note{display:none}.side-bottom{margin:0;padding:0;order:3;flex-shrink:0}.side-bottom .nav-item{margin:0;min-height:44px;border:0;border-radius:24px;padding:9px 16px;background:var(--accent);color:var(--ink);font-size:12px}
+ #navigation{display:flex;align-items:center;justify-content:safe center;gap:2px;order:2;flex:1;overflow-x:auto;scrollbar-width:thin;min-width:0;padding:3px}
+ #navigation .nav-item{width:auto;flex:0 0 auto;font-size:12px;gap:0;padding:10px 9px;border-radius:20px;margin:0;min-height:44px}#navigation .nav-item .icon{display:none}.nav-item.active{background:#f1f9f8;color:var(--accent-dark)}.nav-item.active:after{display:none}
  #appShell,body.nav-collapsed #appShell{margin-left:0}body.nav-collapsed #sidebar{transform:none}#menuButton{display:none}
 }
 @media(max-width:1200px) and (min-width:901px){.page-heading{flex-direction:row;align-items:center}main{padding:28px 30px 12px}.welcome{padding:38px}.wellness-art{width:260px}.quick-care button{padding:20px 14px;gap:10px}.quick-care strong{font-size:13px}.quick-care small{font-size:10px}}
@@ -59,3 +59,5 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 /* Approved logo lockup includes its own wordmark. */
 .brand-logo{display:block;width:224px;height:64px;object-fit:cover;flex-shrink:0}
 @media(max-width:900px){.brand-logo{width:160px;height:46px}}
+
+@media(min-width:901px){#sidebar .brand-logo{width:170px;height:49px}}
