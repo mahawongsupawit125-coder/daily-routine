@@ -171,3 +171,14 @@ html,body{overflow-x:clip}
 @media(max-width:600px){.overview-panel-content .body-icon-layout #bodyForm .body-fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 0}.overview-panel-content .body-icon-layout #bodyForm .body-fields>.body-input-card:nth-child(2){border-right:0}.overview-panel-content .body-icon-layout #bodyForm>.body-input-card{grid-template-columns:36px minmax(0,1fr)}.overview-panel-content .body-icon-layout #bodyForm>.body-input-card .body-input-icon{grid-row:1/3;width:36px;height:36px}.overview-panel-content .body-icon-layout #bodyForm>.body-input-card select{grid-column:2}.overview-panel-content .body-icon-layout #bodyForm>.body-input-card small{grid-column:1/-1}}
 
 .overview-panel-content .body-input-panel>.card-header{display:none}
+
+/* The navigation floats on a restrained botanical wash so the glass can catch its color. */
+:root{--nav-glass:linear-gradient(120deg,#ffffffa8,#ffffff50);--nav-scene:linear-gradient(90deg,#fbfaf6e6,#ffffff70),url('overview-forest.png') center 35%/cover no-repeat}
+#sidebar{background:var(--nav-glass);border-color:var(--glass-edge);box-shadow:var(--glass-shadow);-webkit-backdrop-filter:blur(28px) saturate(145%);backdrop-filter:blur(28px) saturate(145%)}
+#navigation .nav-item{color:var(--ink);border:1px solid transparent}
+#navigation .nav-item.active{background:var(--glass-selected);border-color:var(--glass-edge);box-shadow:inset 0 1px 0 #ffffffe6,0 3px 10px #141b2308;color:var(--ink)}
+#navigation .nav-item:hover{background:#ffffff66;border-color:var(--glass-edge);filter:none}
+#sidebar .side-bottom .nav-item{background:var(--glass-teal);border:1px solid var(--glass-edge);box-shadow:inset 0 1px 0 #ffffffb0,0 5px 16px #34a79f18;color:var(--ink);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+@media(min-width:901px){body.overview-view{position:relative;isolation:isolate}body.overview-view:before{content:'';position:absolute;inset:0 0 auto;height:155px;background:var(--nav-scene);opacity:.55;pointer-events:none;z-index:-1;mask-image:linear-gradient(#000 0%,#000 65%,transparent 100%);-webkit-mask-image:linear-gradient(#000 0%,#000 65%,transparent 100%)}#sidebar{border-radius:28px}}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){#sidebar{background:var(--overview-glass)}}
+@media(prefers-reduced-transparency:reduce){#sidebar{background:var(--overview-glass);-webkit-backdrop-filter:none;backdrop-filter:none}body.overview-view:before{display:none}}
