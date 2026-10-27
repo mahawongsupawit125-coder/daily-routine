@@ -12,7 +12,8 @@ const assets={
  'assets/styles/body.css':'body.css',
  'assets/styles/theme.css':'theme.css',
  'assets/icons/icon.svg':'icon.svg',
- 'assets/icons/logo.svg':'logo.svg'
+ 'assets/icons/logo.svg':'logo.svg',
+ 'assets/icons/logo-v2.png':'logo-v2.png'
 };
 function build(output=path.join(root,'dist')){
  fs.mkdirSync(output,{recursive:true});

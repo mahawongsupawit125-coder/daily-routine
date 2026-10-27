@@ -5,7 +5,7 @@ const {Readable}=require('node:stream');
 const root=path.join(__dirname,'..','dist');
 const host=process.argv.includes('--lan')?'0.0.0.0':'127.0.0.1';
 const port=Number(process.env.PORT)||4173;
-const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.svg':'image/svg+xml','.json':'application/json; charset=utf-8'};
+const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.png':'image/png','.svg':'image/svg+xml','.json':'application/json; charset=utf-8'};
 let rateWindow=0,rateCount=0;
 const localRateLimit={limit:async()=>{const now=Date.now();if(now-rateWindow>60000){rateWindow=now;rateCount=0;}return {success:++rateCount<=6};}};
 const server=http.createServer(async(req,res)=>{
