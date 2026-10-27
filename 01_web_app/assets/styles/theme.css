@@ -209,3 +209,6 @@ input[type="number"]::-webkit-inner-spin-button,input[type="number"]::-webkit-ou
 .overview-panel-content .body-icon-layout #bodyForm .body-fields .number-control{grid-template-columns:28px minmax(0,1fr) 28px;gap:2px;padding:3px}
 .overview-panel-content .body-icon-layout #bodyForm .body-fields .number-step{width:28px;height:34px;min-height:34px;font-size:19px;border-radius:9px}
 @media(max-width:600px){.number-step{width:40px;height:40px;min-height:40px}.number-control{grid-template-columns:40px minmax(0,1fr) 40px}.overview-panel-content .body-icon-layout #bodyForm .body-fields .number-control{grid-template-columns:26px minmax(0,1fr) 26px}.overview-panel-content .body-icon-layout #bodyForm .body-fields .number-step{width:26px}}
+
+.overview-panel-header .overview-back{flex-shrink:0;min-width:110px;min-height:44px;padding:10px 24px;border-radius:18px;font-size:12px;white-space:nowrap}
+@media(max-width:600px){.overview-panel-header .overview-back{min-width:80px;padding:8px 14px;font-size:11px}}
