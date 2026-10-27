@@ -353,11 +353,13 @@ test('translated photo meal options keep their original form values',t=>{
 
 test('a saved English preference restores on load and all empty-state topics have English interface copy',t=>{
  const a=setup(t,{language:'en'});assert.equal(a.w.document.documentElement.lang,'en');
+ for(const date of ['2026-10-19','2026-10-21']){a.date(date);
  for(const route of ['dashboard','body','water','schedule','workout','meals','care','history','settings']){
   a.page(route);const walk=a.w.document.createTreeWalker(a.q('#content'),a.w.NodeFilter.SHOW_TEXT);let node;
   while(node=walk.nextNode()){
-   if(node.parentElement.closest('textarea,.row-title,.row-note,.phase span:first-child'))continue;
+   if(node.parentElement.closest('textarea,[translate="no"],.row-title,.row-note,.phase span:first-child'))continue;
    assert.doesNotMatch(node.textContent,/[ก-๙]/,route+': '+node.textContent);
   }
+ }
  }
 });
