@@ -80,7 +80,7 @@
   const html={dashboard,body:()=>window.JaiBody.render(state.settings.body,!storageBlocked),water:waterPage,schedule:schedulePage,workout:workoutPage,meals:mealsPage,care:carePage,settings:settingsPage,history:dailyHistory}[page]();
   $('#content').innerHTML=(storageBlocked?`<div class="storage-banner">${notice(e(storageIssue)+' <button class="text-btn" data-page="settings">จัดการ / สำรองข้อมูล</button>','error')}</div>`:'')+(page==='dashboard'?html:dashboard(html+historySection()));
   if(panelTopic===page&&$('.overview-panel-content'))$('.overview-panel-content').scrollTop=panelScroll;
-  $('#dailySave').hidden=page==='settings'||page==='history'||page==='body';$('.date-tools').hidden=page==='body';if(page==='body')window.JaiBody.update($('#bodyForm'));updateSaveStatus();enhanceNumberInputs();
+  $('#dailySave').hidden=page==='settings'||page==='history'||page==='body';$('.date-tools').hidden=page==='body';if(page==='body')window.JaiBody.update($('#bodyForm'));updateSaveStatus();enhanceNumberInputs();window.JaiI18n?.apply();
  }
  function historySection(){
   if(page==='care'){
@@ -114,7 +114,7 @@
   if(type==='copy'){title='คัดลอกตารางจากวันที่อื่น';fields=field('วันที่ต้นทาง','source',date==='2026-10-19'?shift(date,-1):'2026-10-19','date','required min="2000-01-01" max="2100-12-31"')+notice('เพิ่มกิจกรรมจากต้นทางต่อท้ายตารางวันนี้ โดยเริ่มสถานะเป็น “ยังไม่ทำ” ทั้งหมด ไม่คัดลอกสถานะทำแล้ว');}
   if(type==='reset'){title='ยืนยันคืนข้อมูลเริ่มต้น';fields=notice('ข้อมูลปัจจุบันทั้งหมดในแอปนี้จะถูกแทนที่ รวมประวัติทุกวัน แนะนำให้ส่งออก JSON ก่อน','warning')+`<label class="check-field"><input name="confirm" type="checkbox" required>ฉันสำรองแล้ว / ต้องการเริ่มใหม่</label>`;}
   if(type==='import'){title='ตรวจแล้ว · พร้อมนำเข้า';fields=notice(`พบข้อมูล ${Object.keys(editorImport.days).length} วัน · แผนน้ำเริ่มต้น ${editorImport.water.length} รายการ<br>การนำเข้าจะแทนที่ข้อมูลทั้งหมดในเครื่องนี้`,'warning')+`<label class="check-field"><input name="confirm" type="checkbox" required>ยืนยันแทนที่ข้อมูลปัจจุบัน</label>`;}
-  $('#editorTitle').textContent=title;$('#editorFields').innerHTML=fields;$('#formError').textContent='';$('#deleteItem').hidden=!deletable;$('#deleteItem').textContent='ลบรายการ';enhanceNumberInputs();$('#editor').showModal();
+  $('#editorTitle').textContent=title;$('#editorFields').innerHTML=fields;$('#formError').textContent='';$('#deleteItem').hidden=!deletable;$('#deleteItem').textContent='ลบรายการ';enhanceNumberInputs();window.JaiI18n?.apply();$('#editor').showModal();
  }
  let editorImport=null;
  function upsert(list,value){const at=list.findIndex(x=>x.id===value.id);if(at<0)list.push(value);else list[at]=value;}

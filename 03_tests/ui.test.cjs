@@ -64,7 +64,7 @@ test('care morning and afternoon lists support adding moving editing deleting an
  b.click(`[data-action="care-edit"][data-id="${afternoon.id}"]`);b.click('#deleteItem');b.click('#deleteItem');
  assert.equal(b.stored().care.some(x=>x.id===afternoon.id),false);
 });
-function setup(t,{width=1440,raw=null,blocked=false}={}){
+function setup(t,{width=1440,raw=null,blocked=false,language=null}={}){
  const errors=[],downloads=[];
  const vc=new VirtualConsole();vc.on('jsdomError',err=>errors.push(err.message));
  const dom=new JSDOM(fs.readFileSync(path.join(__dirname,'../dist/index.html'),'utf8'),{url:'https://jai.test/',runScripts:'outside-only',virtualConsole:vc});
@@ -75,13 +75,15 @@ function setup(t,{width=1440,raw=null,blocked=false}={}){
  w.URL.createObjectURL=blob=>{downloads.push(blob);return 'blob:test';};w.URL.revokeObjectURL=()=>{};
  w.HTMLAnchorElement.prototype.click=function(){downloads.push(this.download);};
  if(raw!==null)w.localStorage.setItem(KEY,raw);
+ if(language)w.localStorage.setItem('your-day.language',language);
  if(blocked)w.Storage.prototype.setItem=function(){throw Error('QuotaExceededError');};
+ w.eval(fs.readFileSync(path.join(__dirname,'../dist/i18n.js'),'utf8'));
  w.eval(fs.readFileSync(path.join(__dirname,'../dist/core.js'),'utf8'));
  w.eval(fs.readFileSync(path.join(__dirname,'../dist/food-photo.js'),'utf8'));
  w.eval(fs.readFileSync(path.join(__dirname,'../dist/body-page.js'),'utf8'));
  w.eval(fs.readFileSync(path.join(__dirname,'../dist/hydration.js'),'utf8'));
  w.eval(fs.readFileSync(path.join(__dirname,'../dist/app.js'),'utf8'));
- t.after(()=>{assert.deepEqual(errors,[]);dom.window.close();});
+ t.after(()=>{assert.deepEqual(errors,[]);w.JaiI18n?.destroy();dom.window.close();});
  const q=s=>doc.querySelector(s),all=s=>[...doc.querySelectorAll(s)];
  const click=s=>{assert.ok(q(s),'missing control: '+s);q(s).click();};
  const change=(s,value)=>{assert.ok(q(s),'missing input: '+s);q(s).value=value;q(s).dispatchEvent(new w.Event('change',{bubbles:true}));};
@@ -331,4 +333,31 @@ test('number controls dispatch normal input and change events and preserve date 
  input.value='0';input.closest('.number-control').querySelector('[data-number-step="1"]').click();
  assert.equal(inputs,1);assert.equal(changes,1);assert.equal(a.stored().days['2026-10-22'].hydration.otherDrinksMl,Number(input.value));
  a.date('2026-10-23');assert.equal(a.q('#hydrationForm [name="otherDrinksMl"]').value,'');
+});
+
+test('TH and EN translate all topics and preserve unsaved input and user-authored records',t=>{
+ const state=C.createState();state.care=[{id:'mine',category:'self',period:'morning',title:'ภาพรวม',note:'บันทึกส่วนตัวของฉัน'}];
+ const a=setup(t,{raw:JSON.stringify(state)});a.page('body');a.q('#bodyForm [name="age"]').value='22';
+ a.click('[data-language="en"]');assert.equal(a.w.document.documentElement.lang,'en');assert.equal(a.q('#overviewTitle').textContent,'Your body profile');assert.equal(a.q('#bodyForm [name="age"]').value,'22');assert.equal(a.q('#bodyForm [name="sex"] option[value="male"]').textContent,'Male');
+ for(const route of ['water','schedule','workout','meals','care','history','settings']){a.page(route);assert.doesNotMatch(a.q('#overviewTitle').textContent,/[ก-๙]/);}
+ a.page('care');assert.equal(a.q('.row-title').textContent,'ภาพรวม');assert.equal(a.q('.row-note').textContent,'บันทึกส่วนตัวของฉัน');
+ a.page('body');a.click('[data-language="th"]');assert.equal(a.q('#overviewTitle').textContent,'คำนวณร่างกายของคุณ');assert.equal(a.q('#bodyForm [name="sex"] option[value="male"]').textContent,'ชาย');
+});
+test('language choice persists independently without creating a daily log',t=>{
+ const a=setup(t);a.click('[data-language="en"]');assert.equal(a.w.localStorage.getItem('your-day.language'),'en');assert.equal(a.w.localStorage.getItem(KEY),null);a.w.JaiI18n.apply();assert.equal(a.q('#overviewTitle').textContent,'Care for yourself todayGrow in your own way');
+});
+test('translated photo meal options keep their original form values',t=>{
+ const a=setup(t);a.page('meals');a.click('[data-food-action="open"]');a.click('[data-language="en"]');
+ assert.equal(a.q('#foodMeal').value,'ไม่ระบุ');assert.equal(a.q('#foodMeal option').textContent,'Breakfast');assert.equal(a.q('#foodMeal option').value,'เช้า');
+});
+
+test('a saved English preference restores on load and all empty-state topics have English interface copy',t=>{
+ const a=setup(t,{language:'en'});assert.equal(a.w.document.documentElement.lang,'en');
+ for(const route of ['dashboard','body','water','schedule','workout','meals','care','history','settings']){
+  a.page(route);const walk=a.w.document.createTreeWalker(a.q('#content'),a.w.NodeFilter.SHOW_TEXT);let node;
+  while(node=walk.nextNode()){
+   if(node.parentElement.closest('textarea,.row-title,.row-note,.phase span:first-child'))continue;
+   assert.doesNotMatch(node.textContent,/[ก-๙]/,route+': '+node.textContent);
+  }
+ }
 });

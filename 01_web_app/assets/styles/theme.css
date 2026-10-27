@@ -212,3 +212,17 @@ input[type="number"]::-webkit-inner-spin-button,input[type="number"]::-webkit-ou
 
 .overview-panel-header .overview-back{flex-shrink:0;min-width:110px;min-height:44px;padding:10px 24px;border-radius:18px;font-size:12px;white-space:nowrap}
 @media(max-width:600px){.overview-panel-header .overview-back{min-width:80px;padding:8px 14px;font-size:11px}}
+
+/* A glass header with language controls; the page canvas stays white. */
+#sidebar{background:linear-gradient(120deg,#ffffffa8,#edf8f340);border-color:var(--glass-edge);box-shadow:var(--glass-shadow);-webkit-backdrop-filter:blur(24px) saturate(130%);backdrop-filter:blur(24px) saturate(130%)}
+.header-actions{display:flex;align-items:center;gap:12px}
+.language-toggle{display:flex;align-items:center;gap:3px;padding:3px;border:1px solid var(--glass-edge);border-radius:18px;background:var(--glass-fill);box-shadow:var(--glass-shadow)}
+.language-toggle button{min-width:44px;min-height:38px;padding:7px 10px;border:1px solid transparent;border-radius:14px;background:transparent;color:var(--muted);font:600 12px/1.4 system-ui,sans-serif}
+.language-toggle button[aria-pressed="true"]{color:var(--ink);background:var(--glass-selected);border-color:var(--glass-edge);box-shadow:inset 0 1px 0 #ffffffd8}
+@media(min-width:901px){#sidebar #navigation{display:none}#sidebar .brand{flex:1}#sidebar .side-bottom{margin-right:0!important}}
+@media(max-width:900px){.header-actions{justify-content:space-between;gap:8px}.header-actions #settingsNav{width:auto;margin:0}.language-toggle{flex-shrink:0}}
+html[lang="en"] .overview-copy h1{font-size:clamp(28px,3.4vw,50px);letter-spacing:-1px}
+html[lang="en"] .overview-topic strong{font-size:11px}html[lang="en"] .overview-topic small{font-size:9px}
+@media(max-width:600px){html[lang="en"] .overview-copy h1{font-size:24px}html[lang="en"] .overview-topic strong{font-size:10px}html[lang="en"] .overview-topic small{font-size:8px}html[lang="en"] .overview-panel-header h1{font-size:15px}html[lang="en"] .overview-stats span{font-size:7px}html[lang="en"] .overview-copy h1 span{white-space:normal}}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){#sidebar{background:var(--overview-glass)}}
+@media(prefers-reduced-transparency:reduce){#sidebar{background:var(--overview-glass);-webkit-backdrop-filter:none;backdrop-filter:none}}

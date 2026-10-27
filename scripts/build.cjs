@@ -4,6 +4,7 @@ const root=path.resolve(__dirname,'..');
 const source=path.join(root,'01_web_app');
 const assets={
  'public/index.html':'index.html',
+ 'src/shared/i18n.js':'i18n.js',
  'src/shared/core.js':'core.js',
  'src/pages/02_body/body-page.js':'body-page.js',
  'src/pages/03_water/hydration.js':'hydration.js',
