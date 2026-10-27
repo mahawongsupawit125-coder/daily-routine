@@ -134,3 +134,21 @@ html,body{overflow-x:clip}
 .overview-hero.has-panel:before{background:linear-gradient(90deg,var(--overview-paper) 0%,var(--overview-paper) 12%,var(--overview-wash) 72%,transparent 100%)}
 .overview-panel-content{scrollbar-width:thin;scrollbar-color:var(--accent) transparent}
 .overview-panel-header .icon-btn{background:var(--overview-glass);border-radius:50%}
+
+/* Frosted glass surfaces share the site's teal palette and retain readable controls. */
+:root{--glass-fill:linear-gradient(135deg,#ffffffa8,#ffffff48);--glass-edge:#ffffffb8;--glass-shadow:0 12px 30px #141b230c,inset 0 1px 0 #fffffff0,inset 0 -1px 0 #ffffff38;--glass-input:#ffffff52;--glass-teal:linear-gradient(135deg,#34a79fe0,#34a79faa);--glass-selected:linear-gradient(135deg,#ffffffb8,#34a79f38)}
+.overview-panel-content .card.body-input-card,.overview-panel-content .card.body-metric,.overview-stats>div,.hydration-stats>div,.overview-topic{background:var(--glass-fill);border:1px solid var(--glass-edge);border-radius:22px;box-shadow:var(--glass-shadow);-webkit-backdrop-filter:blur(20px) saturate(135%);backdrop-filter:blur(20px) saturate(135%)}
+.overview-panel-content .body-icon-layout #bodyForm .body-input-card{border-radius:22px;box-shadow:var(--glass-shadow)}
+.overview-panel-content .body-icon-layout #bodyForm .body-input-icon{background:#34a79f14;border:1px solid var(--glass-edge);box-shadow:inset 0 1px 0 #ffffffb8;color:var(--accent)}
+.overview-view .field input,.overview-view .field select,.overview-view .field textarea,.overview-view .care-note,.overview-view .history-filter input{background:var(--glass-input);border:1px solid var(--glass-edge);border-radius:14px;box-shadow:inset 0 1px 3px #141b2305,0 1px 0 #ffffff70;color:var(--ink)}
+.overview-view .field input:focus,.overview-view .field select:focus,.overview-view .field textarea:focus{background:#ffffffa8;border-color:var(--accent)}
+.overview-view select option{background:var(--surface);color:var(--ink)}
+.overview-view .btn.soft,.overview-view .date-tools,.overview-panel-header .icon-btn{background:var(--glass-fill);border:1px solid var(--glass-edge);box-shadow:var(--glass-shadow);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+.overview-view .btn{border-radius:16px}.overview-view .btn.primary,.overview-view .side-bottom .nav-item{background:var(--glass-teal);border:1px solid #ffffff80;box-shadow:0 6px 18px #34a79f20,inset 0 1px 0 #ffffffa0;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+.overview-view .btn.primary:hover{background:var(--accent);color:var(--ink)}
+.overview-topic[aria-current="page"]{background:var(--glass-selected);border-color:#34a79fb0;box-shadow:var(--glass-shadow),0 0 0 1px #34a79f45}
+.overview-topic:hover{background:linear-gradient(135deg,#ffffffd8,#ffffff68);filter:none}
+.overview-topic-icon{background:#34a79f12;border:1px solid #ffffff70;border-radius:12px}.overview-topic small,.overview-stats span{color:var(--ink)}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.overview-panel-content .card.body-input-card,.overview-panel-content .card.body-metric,.overview-stats>div,.hydration-stats>div,.overview-topic{background:var(--overview-glass)}}
+@media(max-width:600px){.overview-topic,.overview-stats>div{border-radius:14px;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}}
+@media(prefers-reduced-transparency:reduce){.overview-panel-content .card.body-input-card,.overview-panel-content .card.body-metric,.overview-stats>div,.hydration-stats>div,.overview-topic{background:var(--overview-glass);-webkit-backdrop-filter:none;backdrop-filter:none}}
