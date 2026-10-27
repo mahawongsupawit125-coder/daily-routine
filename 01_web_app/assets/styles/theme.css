@@ -171,3 +171,26 @@ html,body{overflow-x:clip}
 @media(max-width:600px){.overview-panel-content .body-icon-layout #bodyForm .body-fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 0}.overview-panel-content .body-icon-layout #bodyForm .body-fields>.body-input-card:nth-child(2){border-right:0}.overview-panel-content .body-icon-layout #bodyForm>.body-input-card{grid-template-columns:36px minmax(0,1fr)}.overview-panel-content .body-icon-layout #bodyForm>.body-input-card .body-input-icon{grid-row:1/3;width:36px;height:36px}.overview-panel-content .body-icon-layout #bodyForm>.body-input-card select{grid-column:2}.overview-panel-content .body-icon-layout #bodyForm>.body-input-card small{grid-column:1/-1}}
 
 .overview-panel-content .body-input-panel>.card-header{display:none}
+
+/* Shared select styling keeps native keyboard, form and validation behavior. */
+:root{--choice-focus:#34a79f55;--choice-hover:#34a79f18;--choice-panel:linear-gradient(135deg,#fffffff2,#edf8f2df);--choice-selected:#34a79f26}
+select{cursor:pointer;transition:border-color .18s,box-shadow .18s;background-color:var(--glass-input);color:var(--ink)}
+select:focus{outline:none}
+select:focus-visible,.overview-view select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+select:disabled{cursor:not-allowed;opacity:.55}
+@supports (appearance:base-select){
+ select:not([multiple]):not([size]),::picker(select){appearance:base-select}
+ select:not([multiple]):not([size]){display:flex;align-items:center;justify-content:space-between;gap:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ select::picker-icon{color:var(--accent);font-size:12px;transition:rotate .18s}
+ select:open::picker-icon{rotate:180deg}
+ select:open{border-color:var(--accent);box-shadow:0 0 0 3px var(--choice-focus)}
+ ::picker(select){padding:7px;margin-block:7px;min-inline-size:anchor-size(width);max-inline-size:calc(100vw - 24px);max-block-size:min(340px,50dvh);overflow:auto;background:var(--choice-panel);border:1px solid var(--glass-edge);border-radius:18px;box-shadow:0 16px 45px #141b2324,inset 0 1px 0 #fff;color:var(--ink);-webkit-backdrop-filter:blur(24px) saturate(135%);backdrop-filter:blur(24px) saturate(135%);scrollbar-width:thin;scrollbar-color:var(--accent) transparent}
+ select option,.overview-view select option,dialog select option{display:flex;align-items:center;gap:10px;min-height:44px;padding:11px 13px;margin:2px 0;border:0;border-radius:12px;background:transparent;color:var(--ink);font-size:13px;line-height:1.5;white-space:normal;text-align:start;cursor:pointer}
+ select option:hover,.overview-view select option:hover,dialog select option:hover{background:var(--choice-hover)}
+ select option:checked,.overview-view select option:checked,dialog select option:checked{background:var(--choice-selected);font-weight:600;color:var(--ink)}
+ select option:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+ select option::checkmark{color:var(--accent);font-size:15px;order:2;margin-inline-start:auto}
+ select option:disabled{opacity:.45;cursor:not-allowed}
+}
+@media(prefers-reduced-motion:reduce){select,select::picker-icon{transition:none}}
+@media(prefers-reduced-transparency:reduce){::picker(select){background:var(--surface);-webkit-backdrop-filter:none;backdrop-filter:none}}
