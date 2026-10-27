@@ -32,7 +32,7 @@ main{max-width:1320px;padding:34px 40px 12px}
 @media(min-width:901px){
  #sidebar{position:relative;inset:auto;width:calc(100% - 48px);max-width:1440px;margin:20px auto 0;padding:12px 20px;display:flex;flex-direction:row;align-items:center;gap:20px;flex-wrap:nowrap;border:1px solid var(--border);border-radius:24px;box-shadow:var(--shadow);overflow:visible;transform:none}
  .brand{margin:0;padding:0;flex:0 0 auto}.brand strong{font-size:22px}.brandmark{width:42px;height:42px}.brand .brand-copy>span{font-size:9px;letter-spacing:2px}
- .nav-caption,.side-note,.local-note{display:none}.side-bottom{margin:0;padding:0;order:3;flex-shrink:0}.side-bottom .nav-item{margin:0;min-height:44px;border:0;border-radius:24px;padding:9px 16px;background:var(--accent);color:var(--ink);font-size:12px}
+ .nav-caption,.side-note,.local-note{display:none}.side-bottom{margin:0;padding:0;order:3;flex-shrink:0}.side-bottom .nav-item{margin:0;min-height:44px;border:0;border-radius:24px;padding:9px 16px;background:var(--accent);color:var(--surface);font-size:12px}
  #navigation{display:flex;align-items:center;justify-content:safe center;gap:2px;order:2;flex:1;overflow-x:auto;scrollbar-width:thin;min-width:0;padding:3px}
  #navigation .nav-item{width:auto;flex:0 0 auto;font-size:12px;gap:0;padding:10px 9px;border-radius:20px;margin:0;min-height:44px}#navigation .nav-item .icon{display:none}.nav-item.active{background:#f1f9f8;color:var(--accent-dark)}.nav-item.active:after{display:none}
  #appShell,body.nav-collapsed #appShell{margin-left:0}body.nav-collapsed #sidebar{transform:none}#menuButton{display:none}
@@ -50,7 +50,7 @@ main{max-width:1320px;padding:34px 40px 12px}
 
 
 /* Teal, white and charcoal palette; dark text keeps the sampled teal readable. */
-.btn.primary{background:var(--accent);color:var(--ink)}
+.btn.primary{background:var(--accent);color:var(--surface)}
 .btn.primary:hover{background:var(--ink);color:var(--surface)}
 .btn.soft,.badge,.icon-tile,.icon-tile.purple,.icon-tile.orange,.icon-tile.blue{color:var(--ink)}
 .text-btn,a,.eyebrow,.home-section-heading>.small,.body-value output,.body-method summary,.body-sources a,.body-metric-tag{color:var(--ink)}
@@ -145,7 +145,7 @@ html,body{overflow-x:clip}
 .overview-view select option{background:var(--surface);color:var(--ink)}
 .overview-view .btn.soft,.overview-view .date-tools,.overview-panel-header .icon-btn{background:var(--glass-fill);border:1px solid var(--glass-edge);box-shadow:var(--glass-shadow);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
 .overview-view .btn{border-radius:16px}.overview-view .btn.primary,.overview-view .side-bottom .nav-item{background:var(--glass-teal);border:1px solid #ffffff80;box-shadow:0 6px 18px #34a79f20,inset 0 1px 0 #ffffffa0;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
-.overview-view .btn.primary:hover{background:var(--accent);color:var(--ink)}
+.overview-view .btn.primary:hover{background:var(--accent);color:var(--surface)}
 .overview-topic[aria-current="page"]{background:var(--glass-selected);border-color:#34a79fb0;box-shadow:var(--glass-shadow),0 0 0 1px #34a79f45}
 .overview-topic:hover{background:linear-gradient(135deg,#ffffffd8,#ffffff68);filter:none}
 .overview-topic-icon{background:#34a79f12;border:1px solid #ffffff70;border-radius:12px}.overview-topic small,.overview-stats span{color:var(--ink)}
@@ -226,3 +226,5 @@ html[lang="en"] .overview-topic strong{font-size:11px}html[lang="en"] .overview-
 @media(max-width:600px){html[lang="en"] .overview-copy h1{font-size:24px}html[lang="en"] .overview-topic strong{font-size:10px}html[lang="en"] .overview-topic small{font-size:8px}html[lang="en"] .overview-panel-header h1{font-size:15px}html[lang="en"] .overview-stats span{font-size:7px}html[lang="en"] .overview-copy h1 span{white-space:normal}}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){#sidebar{background:var(--overview-glass)}}
 @media(prefers-reduced-transparency:reduce){#sidebar{background:var(--overview-glass);-webkit-backdrop-filter:none;backdrop-filter:none}}
+
+.overview-view .side-bottom .nav-item{color:var(--surface)}
