@@ -152,3 +152,22 @@ html,body{overflow-x:clip}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.overview-panel-content .card.body-input-card,.overview-panel-content .card.body-metric,.overview-stats>div,.hydration-stats>div,.overview-topic{background:var(--overview-glass)}}
 @media(max-width:600px){.overview-topic,.overview-stats>div{border-radius:14px;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}}
 @media(prefers-reduced-transparency:reduce){.overview-panel-content .card.body-input-card,.overview-panel-content .card.body-metric,.overview-stats>div,.hydration-stats>div,.overview-topic{background:var(--overview-glass);-webkit-backdrop-filter:none;backdrop-filter:none}}
+
+/* Four compact profile fields form a single glass strip above the remaining form. */
+.overview-panel-content .body-icon-layout #bodyForm .body-fields{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-column:1/-1;gap:0;padding:14px 8px;background:var(--glass-fill);border:1px solid var(--glass-edge);border-radius:22px;box-shadow:var(--glass-shadow);-webkit-backdrop-filter:blur(20px) saturate(135%);backdrop-filter:blur(20px) saturate(135%)}
+.overview-panel-content .body-icon-layout #bodyForm .body-fields>.body-input-card{margin:0;padding:6px 10px;background:transparent;border:0;border-right:1px solid var(--glass-edge);border-radius:0;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;align-items:center}
+.overview-panel-content .body-icon-layout #bodyForm .body-fields>.body-input-card:last-child{border-right:0}
+.overview-panel-content .body-icon-layout #bodyForm .body-fields .body-input-icon{width:46px;height:46px;margin:0 auto 10px;background:var(--glass-teal);color:var(--surface);box-shadow:0 4px 12px #141b2312,inset 0 1px 0 var(--glass-edge)}
+.overview-panel-content .body-icon-layout #bodyForm .body-fields .body-input-icon svg{width:25px;height:25px}
+.overview-panel-content .body-icon-layout #bodyForm .body-fields .body-input-card>span:not(.body-input-icon){min-height:0;font-size:11px;margin-bottom:8px;white-space:nowrap}
+.overview-panel-content .body-icon-layout #bodyForm .body-fields input,.overview-panel-content .body-icon-layout #bodyForm .body-fields select{min-height:40px;width:100%;padding:5px;font-size:19px;border-radius:12px;text-align:center}
+.overview-panel-content .body-icon-layout #bodyForm .body-fields select{font-size:12px}
+.overview-panel-content .body-icon-layout #bodyForm .body-fields small{font-size:9px;line-height:1.5;margin-top:7px}
+.overview-panel-content .body-icon-layout #bodyForm>.body-input-card{grid-column:1/-1;display:grid;grid-template-columns:46px minmax(100px,.7fr) minmax(0,1.3fr);gap:8px 14px;align-items:center;text-align:left;padding:14px}
+.overview-panel-content .body-icon-layout #bodyForm>.body-input-card .body-input-icon{grid-row:1/3;margin:0;width:46px;height:46px}
+.overview-panel-content .body-icon-layout #bodyForm>.body-input-card>span:not(.body-input-icon){min-height:0;margin:0;justify-content:flex-start}
+.overview-panel-content .body-icon-layout #bodyForm>.body-input-card small{grid-column:2/-1;margin:0}
+@media(max-width:900px){.overview-panel-content .body-icon-layout #bodyForm .body-fields{padding:10px 4px}.overview-panel-content .body-icon-layout #bodyForm .body-fields>.body-input-card{padding:4px}.overview-panel-content .body-icon-layout #bodyForm .body-fields .body-input-icon{width:38px;height:38px}.overview-panel-content .body-icon-layout #bodyForm .body-fields input{font-size:16px}.overview-panel-content .body-icon-layout #bodyForm .body-fields .body-input-card>span:not(.body-input-icon){font-size:9px}.overview-panel-content .body-icon-layout #bodyForm .body-fields small{font-size:8px}}
+@media(max-width:600px){.overview-panel-content .body-icon-layout #bodyForm .body-fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 0}.overview-panel-content .body-icon-layout #bodyForm .body-fields>.body-input-card:nth-child(2){border-right:0}.overview-panel-content .body-icon-layout #bodyForm>.body-input-card{grid-template-columns:36px minmax(0,1fr)}.overview-panel-content .body-icon-layout #bodyForm>.body-input-card .body-input-icon{grid-row:1/3;width:36px;height:36px}.overview-panel-content .body-icon-layout #bodyForm>.body-input-card select{grid-column:2}.overview-panel-content .body-icon-layout #bodyForm>.body-input-card small{grid-column:1/-1}}
+
+.overview-panel-content .body-input-panel>.card-header{display:none}
