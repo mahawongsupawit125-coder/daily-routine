@@ -111,3 +111,19 @@ html,body{overflow-x:clip}
 @media print{.overview-view main{height:auto}.overview-hero{min-height:600px}.overview-topics{display:none}}
 
 @media(max-width:350px){.overview-copy h1{font-size:20px}.overview-copy h1 span{white-space:nowrap}}
+
+/* Topic forms share the overview shell and scroll only inside their content area. */
+.overview-hero.has-panel{grid-template-columns:minmax(0,1fr) minmax(240px,300px);align-items:stretch;gap:30px;padding:20px}
+.has-panel .overview-topics{align-self:center}
+.overview-panel{min-width:0;min-height:0;display:flex;flex-direction:column;background:var(--overview-glass);border:1px solid var(--border);border-radius:18px;overflow:hidden}
+.overview-panel-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 18px;border-bottom:1px solid var(--border);flex-shrink:0}
+.overview-panel-header .eyebrow{margin:0 0 4px;font-size:9px}
+.overview-panel-header h1{font-size:23px;line-height:1.4;letter-spacing:-.5px}
+.overview-panel-content{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;padding:18px}
+.overview-panel-content>.card{margin-bottom:18px}.overview-panel-content .card{padding:18px}
+.overview-panel-content .two-col,.overview-panel-content .settings-grid,.overview-panel-content .water-page-top{grid-template-columns:minmax(0,1fr)}
+.overview-panel-content .body-icon-layout #bodyForm,.overview-panel-content .body-card-layout .body-results{grid-template-columns:repeat(2,minmax(0,1fr))}
+.overview-panel-content .body-icon-layout #bodyForm .body-input-card{padding:15px}.overview-panel-content .body-card-layout{gap:20px}
+.overview-topic[aria-current="page"]{border-color:var(--accent);background:var(--light);box-shadow:0 0 0 1px var(--accent)}
+@media(max-width:900px){.overview-hero.has-panel{grid-template-columns:minmax(0,1fr) minmax(210px,.7fr);gap:12px;padding:12px}.overview-panel-header{padding:10px 12px}.overview-panel-header h1{font-size:19px}.overview-panel-content{padding:12px}}
+@media(max-width:600px){.overview-hero.has-panel{display:flex;gap:9px;padding:10px;justify-content:flex-start}.overview-panel{flex:1}.has-panel .overview-topics{flex-shrink:0;align-self:stretch;gap:5px}.has-panel .overview-topic{min-height:44px;padding:5px}.has-panel .overview-topic small{display:none}.has-panel .overview-topic-history{grid-column:auto}.overview-panel-header{padding:8px 10px}.overview-panel-header h1{font-size:17px}.overview-panel-header .eyebrow{display:none}.overview-panel-header .icon-btn{min-height:36px;min-width:36px}.overview-panel-content{padding:10px}.overview-panel-content .body-icon-layout #bodyForm,.overview-panel-content .body-card-layout .body-results{grid-template-columns:minmax(0,1fr)}.overview-panel-content .body-icon-layout .body-save-card{display:flex;align-items:stretch}.overview-panel-content .body-icon-layout .body-save-card .body-input-icon{display:none}}

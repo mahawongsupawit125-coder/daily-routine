@@ -47,12 +47,14 @@
 /* @include src/pages/07_self_care/page.js */
 /* @include src/pages/09_settings/page.js */
  function render(){
-  document.body.classList.toggle('overview-view',page==='dashboard');
+  const previousPanel=$('.overview-panel-content'),panelScroll=previousPanel?.scrollTop||0,panelTopic=previousPanel?.dataset.topic;
+  document.body.classList.toggle('overview-view',page!=='account');
   $('#selectedDate').value=date;$('#pageTitle').textContent=routes[page][1];$('#pageSubtitle').textContent=routes[page][2];$('#breadcrumb').textContent=routes[page][0];$('#eyebrow').textContent=page==='dashboard'?'YOUR EVERYDAY, A LITTLE BETTER':'YOUR DAY / '+page.toUpperCase();
   $('#navigation').innerHTML=Object.keys(routes).filter(k=>k!=='settings').map(k=>`<button class="nav-item ${k===page?'active':''}" data-page="${k}" ${k===page?'aria-current="page"':''}>${icon(k==='history'?'clock':k==='body'?'care':k)}${routes[k][0]}</button>`).join('');
   $('#settingsNav').innerHTML=icon('settings')+'ตั้งค่า';$('#settingsNav').classList.toggle('active',page==='settings');$('#settingsNav').setAttribute('aria-current',page==='settings'?'page':'false');
   const html={dashboard,body:()=>window.JaiBody.render(state.settings.body,!storageBlocked),water:waterPage,schedule:schedulePage,workout:workoutPage,meals:mealsPage,care:carePage,settings:settingsPage,history:dailyHistory}[page]();
-  $('#content').innerHTML=(storageBlocked?`<div class="storage-banner">${notice(e(storageIssue)+' <button class="text-btn" data-page="settings">จัดการ / สำรองข้อมูล</button>','error')}</div>`:'')+html+historySection();
+  $('#content').innerHTML=(storageBlocked?`<div class="storage-banner">${notice(e(storageIssue)+' <button class="text-btn" data-page="settings">จัดการ / สำรองข้อมูล</button>','error')}</div>`:'')+(page==='dashboard'?html:dashboard(html+historySection()));
+  if(panelTopic===page&&$('.overview-panel-content'))$('.overview-panel-content').scrollTop=panelScroll;
   $('#dailySave').hidden=page==='settings'||page==='history'||page==='body';$('.date-tools').hidden=page==='body';if(page==='body')window.JaiBody.update($('#bodyForm'));updateSaveStatus();
  }
  function historySection(){
@@ -66,7 +68,7 @@
   }
   return '';
  }
- function navigate(p){if(!Object.hasOwn(routes,p))return;page=p;location.hash=p;closeNav();render();window.scrollTo({top:0,behavior:'instant'});$('#main').focus({preventScroll:true});}
+ function navigate(p){if(!Object.hasOwn(routes,p))return;page=p;location.hash=p;closeNav();render();window.scrollTo({top:0,behavior:'instant'});($('#overviewTitle')||$('#main')).focus({preventScroll:true});}
  function selectDate(value){if(!C.validDate(value)||value<'2000-01-01'||value>'2100-12-31'){toast('เลือกวันที่ระหว่างปี 2000–2100');return;}date=value;render();}
  function closeNav(){document.body.classList.remove('nav-open');$('#scrim').hidden=true;const closed=matchMedia('(max-width:900px)').matches||document.body.classList.contains('nav-collapsed');$('#menuButton').setAttribute('aria-expanded',String(!closed));$('#sidebar').inert=closed;}
  function toggleNav(){if(matchMedia('(max-width:900px)').matches){const open=!document.body.classList.contains('nav-open');document.body.classList.toggle('nav-open',open);$('#scrim').hidden=!open;$('#sidebar').inert=!open;$('#menuButton').setAttribute('aria-expanded',String(open));if(open)$('#closeNav').focus();else $('#menuButton').focus();}else{document.body.classList.toggle('nav-collapsed');const open=!document.body.classList.contains('nav-collapsed');$('#menuButton').setAttribute('aria-expanded',String(open));$('#sidebar').inert=!open;}}

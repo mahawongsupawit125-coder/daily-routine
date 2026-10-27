@@ -277,11 +277,34 @@ test('overview links cover every topic and update the selected date without savi
  assert.equal(a.q('.overview-topic-water small').textContent,'0.0 ลิตร · 0 แก้ววันนี้');
  assert.equal(a.w.localStorage.getItem(KEY),null);
  a.click('.overview-topic-water');
- assert.equal(a.w.document.body.classList.contains('overview-view'),false);
+ assert.equal(a.w.document.body.classList.contains('overview-view'),true);
+ assert.ok(a.q('.overview-panel-content #hydrationForm'));
+ assert.ok(a.q('.overview-topics .overview-topic-water[aria-current="page"]'));
+ a.q('.overview-panel-content').scrollTop=120;
  assert.ok(a.q('#hydrationForm'));
  a.click('[data-action="water-toggle"][data-id="w0"]');
+ assert.equal(a.q('.overview-panel-content').scrollTop,120);
  a.page('dashboard');
  assert.match(a.q('.overview-topic-water small').textContent,/0.3 ลิตร/);
  a.date('2026-10-23');
  assert.match(a.q('.overview-topic-water small').textContent,/0.0 ลิตร/);
+});
+
+test('all topics render their existing forms inside the overview and can return to the introduction',t=>{
+ const a=setup(t);
+ for(const route of ['body','water','schedule','workout','meals','care','history']){
+  a.click('.overview-topic-'+route);
+  assert.ok(a.q('.overview-hero.has-panel .overview-panel-content'),route);
+  assert.equal(a.all('.overview-topics .overview-topic').length,7);
+  assert.ok(a.q('.overview-topic-'+route+'[aria-current="page"]'));
+ }
+ a.click('.overview-panel-header [data-page="dashboard"]');
+ assert.equal(a.q('.overview-panel'),null);
+ assert.ok(a.q('.overview-copy'));
+ a.page('body');
+ for(const [name,value] of Object.entries({age:'30',sex:'male',height:'180',weight:'81',activity:'moderate'}))a.q('#bodyForm [name="'+name+'"]').value=value;
+ a.q('#bodyForm').requestSubmit();
+ a.click('.overview-topic-water');
+ a.click('.overview-topic-body');
+ assert.equal(a.q('#bodyForm [name="weight"]').value,'81');
 });
