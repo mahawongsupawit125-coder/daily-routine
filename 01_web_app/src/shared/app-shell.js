@@ -71,6 +71,42 @@
  });
  const numberObserver=new MutationObserver(enhanceNumberInputs);
  numberObserver.observe(document.body,{childList:true,subtree:true});
+
+ let calendarMonth=date.slice(0,7),calendarCursor=date;
+ const calendarLocale=()=>window.JaiI18n?.getLanguage()==='en'?'en-GB':'th-TH';
+ const calendarText=(th,en)=>window.JaiI18n?.getLanguage()==='en'?en:th;
+ function updateHeaderDate(){
+  const button=$('#datePickerButton');button.innerHTML=icon('schedule')+'<span>'+e(new Date(date+'T12:00:00').toLocaleDateString(calendarLocale(),{day:'numeric',month:'short',year:'numeric'}))+'</span>';
+  button.setAttribute('aria-label',calendarText('เลือกวันที่','Choose date')+' '+new Date(date+'T12:00:00').toLocaleDateString(calendarLocale(),{dateStyle:'full'}));
+  $('#prevDate').disabled=date<='2000-01-01';$('#nextDate').disabled=date>='2100-12-31';
+ }
+ function renderCalendar(){
+  const [year,monthNumber]=calendarMonth.split('-').map(Number),month=monthNumber-1,first=calendarMonth+'-01',offset=(new Date(first+'T12:00:00').getDay()+6)%7,today=localDate(),locale=calendarLocale();
+  const monthOptions=Array.from({length:12},(_,i)=>'<option value="'+i+'" '+(i===month?'selected':'')+'>'+e(new Date(2026,i,1).toLocaleDateString(locale,{month:'long'}))+'</option>').join('');
+  const yearOptions=Array.from({length:101},(_,i)=>{const y=2000+i;return '<option value="'+y+'" '+(y===year?'selected':'')+'>'+new Date(y,0,1).toLocaleDateString(locale,{year:'numeric'})+'</option>';}).join('');
+  const weekdays=Array.from({length:7},(_,i)=>'<span>'+e(new Date(2026,0,5+i).toLocaleDateString(locale,{weekday:'short'}))+'</span>').join('');
+  const days=Array.from({length:42},(_,i)=>{const iso=shift(first,i-offset),outside=iso.slice(0,7)!==calendarMonth,disabled=iso<'2000-01-01'||iso>'2100-12-31';return '<button type="button" data-calendar-date="'+iso+'" class="calendar-day '+(outside?'outside ':'')+(iso===date?'selected ':'')+(iso===today?'today':'')+'" '+(disabled?'disabled':'')+' tabindex="'+(iso===calendarCursor?'0':'-1')+'" aria-pressed="'+(iso===date)+'" '+(iso===today?'aria-current="date"':'')+' aria-label="'+e(new Date(iso+'T12:00:00').toLocaleDateString(locale,{dateStyle:'full'}))+'">'+Number(iso.slice(-2))+'</button>';}).join('');
+  $('#datePicker').innerHTML='<div class="calendar-heading"><button type="button" class="calendar-arrow" data-calendar-month="-1" aria-label="'+calendarText('เดือนก่อนหน้า','Previous month')+'" '+(calendarMonth==='2000-01'?'disabled':'')+'>‹</button><select id="calendarMonth" aria-label="'+calendarText('เลือกเดือน','Choose month')+'">'+monthOptions+'</select><select id="calendarYear" aria-label="'+calendarText('เลือกปี','Choose year')+'">'+yearOptions+'</select><button type="button" class="calendar-arrow" data-calendar-month="1" aria-label="'+calendarText('เดือนถัดไป','Next month')+'" '+(calendarMonth==='2100-12'?'disabled':'')+'>›</button></div><div class="calendar-weekdays" aria-hidden="true">'+weekdays+'</div><div class="calendar-days" role="group" aria-label="'+calendarText('เลือกวัน','Choose day')+'">'+days+'</div><footer class="calendar-footer"><button type="button" class="btn soft" data-calendar-today>'+calendarText('วันนี้','Today')+'</button><button type="button" class="calendar-close" data-calendar-close>'+calendarText('ปิด','Close')+'</button></footer>';
+  $('#datePicker').setAttribute('aria-label',calendarText('เลือกวันที่','Choose date'));
+ }
+ function closeCalendar(focus=true){const picker=$('#datePicker');picker.dataset.open='false';if(picker.hidePopover&&picker.matches(':popover-open'))picker.hidePopover();$('#datePickerButton').setAttribute('aria-expanded','false');if(focus)$('#datePickerButton').focus({preventScroll:true});}
+ function openCalendar(){
+  const picker=$('#datePicker');if(picker.dataset.open==='true'){closeCalendar();return;}
+  calendarMonth=date.slice(0,7);calendarCursor=date;renderCalendar();picker.dataset.open='true';if(picker.showPopover)picker.showPopover();$('#datePickerButton').setAttribute('aria-expanded','true');
+  const box=$('#datePickerButton').getBoundingClientRect(),width=picker.offsetWidth||336,height=picker.offsetHeight||400;
+  picker.style.left=Math.max(12,Math.min(box.left,innerWidth-width-12))+'px';picker.style.top=Math.max(12,Math.min(box.bottom+10,innerHeight-height-12))+'px';
+  picker.querySelector('[data-calendar-date="'+date+'"]')?.focus({preventScroll:true});
+ }
+ function shiftCalendarMonth(delta){const [y,m]=calendarMonth.split('-').map(Number),target=new Date(y,m-1+delta,1,12);if(target.getFullYear()<2000||target.getFullYear()>2100)return;calendarMonth=target.getFullYear()+'-'+String(target.getMonth()+1).padStart(2,'0');calendarCursor=calendarMonth+'-01';renderCalendar();}
+ function syncHeaderLayout(){const mobile=matchMedia('(max-width:900px)').matches;$('#mobileHeader').hidden=!mobile;(mobile?$('#mobileHeader'):$('#sidebar .side-bottom')).append($('.header-actions'));closeCalendar(false);}
+ $('#datePickerButton').addEventListener('click',openCalendar);
+ $('#datePicker').addEventListener('toggle',event=>{if(event.newState==='closed'){$('#datePicker').dataset.open='false';$('#datePickerButton').setAttribute('aria-expanded','false');}});
+ $('#datePicker').addEventListener('click',event=>{const day=event.target.closest('[data-calendar-date]'),month=event.target.closest('[data-calendar-month]');if(day&&!day.disabled){closeCalendar(false);selectDate(day.dataset.calendarDate);$('#datePickerButton').focus({preventScroll:true});}else if(month){shiftCalendarMonth(Number(month.dataset.calendarMonth));}else if(event.target.closest('[data-calendar-today]')){closeCalendar(false);selectDate(localDate());$('#datePickerButton').focus({preventScroll:true});}else if(event.target.closest('[data-calendar-close]'))closeCalendar();});
+ $('#datePicker').addEventListener('change',event=>{if(!['calendarMonth','calendarYear'].includes(event.target.id))return;const focus=event.target.id;calendarMonth=$('#calendarYear').value+'-'+String(Number($('#calendarMonth').value)+1).padStart(2,'0');calendarCursor=calendarMonth+'-01';renderCalendar();$('#'+focus).focus({preventScroll:true});});
+ $('#datePicker').addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();closeCalendar();return;}const day=event.target.closest('[data-calendar-date]');if(!day)return;const moves={ArrowLeft:-1,ArrowRight:1,ArrowUp:-7,ArrowDown:7};let next;if(Object.hasOwn(moves,event.key))next=shift(day.dataset.calendarDate,moves[event.key]);else if(event.key==='Home'||event.key==='End'){const dow=(new Date(day.dataset.calendarDate+'T12:00:00').getDay()+6)%7;next=shift(day.dataset.calendarDate,event.key==='Home'?-dow:6-dow);}else if(event.key==='PageUp'||event.key==='PageDown'){event.preventDefault();shiftCalendarMonth(event.key==='PageUp'?-1:1);$('#datePicker').querySelector('[data-calendar-date="'+calendarCursor+'"]')?.focus();return;}else return;event.preventDefault();if(next<'2000-01-01'||next>'2100-12-31')return;calendarCursor=next;calendarMonth=next.slice(0,7);renderCalendar();$('#datePicker').querySelector('[data-calendar-date="'+next+'"]')?.focus({preventScroll:true});});
+ document.addEventListener('click',event=>{if($('#datePicker').dataset.open==='true'&&!event.target.closest('#datePicker,#datePickerButton'))closeCalendar(false);});
+ document.addEventListener('your-day-language',()=>{updateHeaderDate();if($('#datePicker').dataset.open==='true')renderCalendar();});
+ window.addEventListener('resize',()=>{if($('#datePicker').dataset.open==='true')closeCalendar(false);});
  function render(){
   const previousPanel=$('.overview-panel-content'),panelScroll=previousPanel?.scrollTop||0,panelTopic=previousPanel?.dataset.topic;
   document.body.classList.toggle('overview-view',page!=='account');
@@ -80,7 +116,7 @@
   const html={dashboard,body:()=>window.JaiBody.render(state.settings.body,!storageBlocked),water:waterPage,schedule:schedulePage,workout:workoutPage,meals:mealsPage,care:carePage,settings:settingsPage,history:dailyHistory}[page]();
   $('#content').innerHTML=(storageBlocked?`<div class="storage-banner">${notice(e(storageIssue)+' <button class="text-btn" data-page="settings">จัดการ / สำรองข้อมูล</button>','error')}</div>`:'')+(page==='dashboard'?html:dashboard(html+historySection()));
   if(panelTopic===page&&$('.overview-panel-content'))$('.overview-panel-content').scrollTop=panelScroll;
-  $('#dailySave').hidden=page==='settings'||page==='history'||page==='body';$('.date-tools').hidden=page==='body';if(page==='body')window.JaiBody.update($('#bodyForm'));updateSaveStatus();enhanceNumberInputs();window.JaiI18n?.apply();
+  $('#dailySave').hidden=page==='settings'||page==='history'||page==='body';$('.date-tools').hidden=false;if(page==='body')window.JaiBody.update($('#bodyForm'));updateSaveStatus();enhanceNumberInputs();window.JaiI18n?.apply();updateHeaderDate();
  }
  function historySection(){
   if(page==='care'){
@@ -94,7 +130,15 @@
   return '';
  }
  function navigate(p){if(!Object.hasOwn(routes,p))return;page=p;location.hash=p;closeNav();render();window.scrollTo({top:0,behavior:'instant'});($('#overviewTitle')||$('#main')).focus({preventScroll:true});}
- function selectDate(value){if(!C.validDate(value)||value<'2000-01-01'||value>'2100-12-31'){toast('เลือกวันที่ระหว่างปี 2000–2100');return;}date=value;render();}
+ function selectDate(value){
+  if(!C.validDate(value)||value<'2000-01-01'||value>'2100-12-31'){toast('เลือกวันที่ระหว่างปี 2000–2100');return;}
+  const form=page==='body'?$('#bodyForm'):null;
+  const fields=form?Array.from(form.elements).filter(field=>field.name):[];
+  const draft=fields.map(field=>[field.name,field.value]);
+  const dirty=fields.some(field=>field.value!==(field.tagName==='SELECT'?(Array.from(field.options).find(option=>option.defaultSelected)||field.options[0]).value:field.defaultValue));
+  date=value;render();
+  if(form){const next=$('#bodyForm');for(const [name,value] of draft)next.elements[name].value=value;window.JaiBody.update(next,dirty);window.JaiI18n?.apply();}
+ }
  function closeNav(){document.body.classList.remove('nav-open');$('#scrim').hidden=true;const closed=matchMedia('(max-width:900px)').matches||document.body.classList.contains('nav-collapsed');$('#menuButton').setAttribute('aria-expanded',String(!closed));$('#sidebar').inert=closed;}
  function toggleNav(){if(matchMedia('(max-width:900px)').matches){const open=!document.body.classList.contains('nav-open');document.body.classList.toggle('nav-open',open);$('#scrim').hidden=!open;$('#sidebar').inert=!open;$('#menuButton').setAttribute('aria-expanded',String(open));if(open)$('#closeNav').focus();else $('#menuButton').focus();}else{document.body.classList.toggle('nav-collapsed');const open=!document.body.classList.contains('nav-collapsed');$('#menuButton').setAttribute('aria-expanded',String(open));$('#sidebar').inert=!open;}}
  const toggle=(a,id)=>a.includes(id)?a.filter(x=>x!==id):[...a,id];
@@ -179,9 +223,9 @@
  $('#menuButton').innerHTML=icon('menu');$('#menuButton').addEventListener('click',toggleNav);$('#closeNav').addEventListener('click',()=>{closeNav();$('#menuButton').focus();});$('#scrim').addEventListener('click',closeNav);
  $('#selectedDate').addEventListener('change',ev=>selectDate(ev.target.value));$('#prevDate').addEventListener('click',()=>selectDate(shift(date,-1)));$('#nextDate').addEventListener('click',()=>selectDate(shift(date,1)));$('#today').addEventListener('click',()=>selectDate(localDate()));
  window.addEventListener('hashchange',()=>{const next=location.hash.slice(1);if(Object.hasOwn(routes,next)&&next!==page){page=next;render();closeNav();}});
- const mq=matchMedia('(max-width:900px)');mq.addEventListener('change',()=>{document.body.classList.remove('nav-collapsed');closeNav();$('#sidebar').inert=mq.matches;$('#menuButton').setAttribute('aria-expanded',String(!mq.matches));});
+ const mq=matchMedia('(max-width:900px)');mq.addEventListener('change',()=>{syncHeaderLayout();document.body.classList.remove('nav-collapsed');closeNav();$('#sidebar').inert=mq.matches;$('#menuButton').setAttribute('aria-expanded',String(!mq.matches));});
  document.addEventListener('keydown',ev=>{if(!document.body.classList.contains('nav-open'))return;if(ev.key==='Escape'){closeNav();$('#menuButton').focus();}if(ev.key==='Tab'){const items=[...$('#sidebar').querySelectorAll('button')].filter(x=>x.getClientRects().length);if(ev.shiftKey&&document.activeElement===items[0]){ev.preventDefault();items.at(-1).focus();}else if(!ev.shiftKey&&document.activeElement===items.at(-1)){ev.preventDefault();items[0].focus();}}});
  window.addEventListener('storage',ev=>{if(ev.key===KEY){storageBlocked=true;storageIssue='ข้อมูลถูกเปลี่ยนจากอีกแท็บ กรุณาส่งออกงานในแท็บนี้ก่อน แล้วรีเฟรชหน้าเพื่อใช้ข้อมูลล่าสุด';render();}});
  window.JaiFood.init({getDate:()=>date,openSettings:()=>navigate('settings'),onReview:(draft,targetDate)=>{selectDate(targetDate);navigate('meals');openEditor('meal',undefined,undefined,draft);}});
- closeNav();$('#sidebar').inert=mq.matches;$('#menuButton').setAttribute('aria-expanded',String(!mq.matches));render();
+ syncHeaderLayout();closeNav();$('#sidebar').inert=mq.matches;$('#menuButton').setAttribute('aria-expanded',String(!mq.matches));render();
 })();

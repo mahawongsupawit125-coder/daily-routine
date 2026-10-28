@@ -239,3 +239,27 @@ html[lang="en"] .overview-topic strong{font-size:11px}html[lang="en"] .overview-
 /* Remove decorative heading kickers and the four profile-field helper captions. */
 .eyebrow,.body-metric-tag,.heading-kicker{display:none}
 .body-fields .body-input-card>small{display:none}
+
+/* One shared header date control and an accessible glass calendar for all topics. */
+.overview-view .page-heading{display:none}
+.header-actions .date-tools{display:flex;align-items:center;flex-wrap:nowrap;gap:2px;width:auto;min-width:0;padding:3px;border:1px solid var(--glass-edge);border-radius:18px;background:var(--glass-fill);box-shadow:var(--glass-shadow)}
+.header-actions .date-step{display:grid;place-items:center;flex-shrink:0;width:30px;min-height:38px;padding:0;border:0;border-radius:12px;background:transparent;color:var(--accent);font-size:23px;line-height:1}
+.header-actions .date-picker-trigger{display:flex;align-items:center;justify-content:center;gap:8px;min-width:140px;min-height:38px;padding:7px 10px;border:0;border-radius:12px;background:transparent;color:var(--ink);font-size:12px;white-space:nowrap}
+.date-picker-trigger .icon{width:16px;height:16px;color:var(--accent)}
+.header-actions .date-tools #today{display:inline-flex;margin:0;padding:7px 12px;min-height:38px;font-size:11px;border-radius:12px}
+.header-actions #settingsNav{display:flex;align-items:center;justify-content:center;gap:8px;width:auto;margin:0;min-height:44px;padding:9px 16px;border:1px solid var(--glass-edge);border-radius:18px;background:var(--glass-teal);color:var(--surface);font-size:12px;white-space:nowrap;box-shadow:var(--glass-shadow)}
+.calendar-popover{display:none;position:fixed;inset:auto;margin:0;width:min(336px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:auto;padding:14px;border:1px solid var(--glass-edge);border-radius:24px;background:var(--choice-panel);color:var(--ink);box-shadow:0 18px 60px #141b2330,inset 0 1px 0 #fff;-webkit-backdrop-filter:blur(26px) saturate(135%);backdrop-filter:blur(26px) saturate(135%);z-index:45}
+.calendar-popover:popover-open,.calendar-popover[data-open="true"]{display:block}
+.calendar-heading{display:grid;grid-template-columns:30px minmax(0,1.2fr) minmax(0,1fr) 30px;align-items:center;gap:5px;margin-bottom:12px}
+.calendar-heading select{min-width:0;width:100%;min-height:38px;padding:6px;border:1px solid var(--glass-edge);border-radius:12px;background:var(--glass-fill);font-size:12px}
+.calendar-arrow{width:30px;height:36px;border:0;border-radius:10px;background:var(--glass-fill);color:var(--accent);font-size:23px}
+.calendar-weekdays,.calendar-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px}
+.calendar-weekdays{margin-bottom:6px;text-align:center;color:var(--muted);font-size:11px}
+.calendar-day{display:grid;place-items:center;min-width:0;min-height:38px;padding:0;border:1px solid transparent;border-radius:12px;background:transparent;color:var(--ink);font-size:12px;font-variant-numeric:tabular-nums}
+.calendar-day.outside{color:var(--muted);opacity:.45}.calendar-day.today{border-color:var(--accent)}.calendar-day:hover{background:var(--choice-hover);filter:none}.calendar-day.selected{background:var(--accent);color:var(--surface);box-shadow:0 4px 12px #34a79f25}.calendar-day:disabled{opacity:.2}
+.calendar-footer{display:flex;align-items:center;justify-content:space-between;padding-top:12px;margin-top:10px;border-top:1px solid var(--glass-edge)}.calendar-footer .btn{min-height:36px;padding:7px 14px;font-size:12px}.calendar-close{min-height:36px;padding:7px 12px;border:0;border-radius:12px;background:transparent;color:var(--muted);font-size:12px}
+.mobile-header{padding:12px 12px 8px 64px;min-height:112px}
+@media(max-width:1100px) and (min-width:901px){#sidebar{gap:12px;padding:12px 16px}.header-actions{gap:8px}#sidebar .brand-logo{width:145px;height:42px}.header-actions .header-overview{padding:9px 14px}.header-actions .date-picker-trigger{min-width:122px;padding:7px}.header-actions #settingsNav{padding:9px 12px}}
+@media(max-width:900px){.overview-view main{height:calc(100dvh - 120px)}.mobile-menu-trigger{position:absolute;top:12px;left:12px;margin:0;min-height:42px;z-index:2}.mobile-header .header-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px}.mobile-header .header-overview{min-height:42px;padding:8px 12px}.mobile-header .date-tools{order:4;flex:0 0 calc(100% + 52px);width:calc(100% + 52px);margin-left:-52px;justify-content:space-between}.mobile-header .date-picker-trigger{flex:1;min-width:0}.mobile-header #settingsNav{min-height:42px;padding:8px 10px;font-size:11px}.mobile-header #settingsNav .icon{display:none}.mobile-header .language-toggle{flex-shrink:0}.mobile-header .language-toggle button{min-height:36px}}
+@media(prefers-reduced-transparency:reduce){.calendar-popover{background:var(--surface);-webkit-backdrop-filter:none;backdrop-filter:none}}
+@media print{.mobile-header,.calendar-popover{display:none!important}.overview-view main{height:auto}}

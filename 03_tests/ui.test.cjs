@@ -363,3 +363,28 @@ test('a saved English preference restores on load and all empty-state topics hav
  }
  }
 });
+
+test('date controls follow overview in the header and remain available on every topic',t=>{
+ const a=setup(t);assert.equal(a.q('.header-overview').nextElementSibling.className,'date-tools');
+ for(const route of ['dashboard','body','water','schedule','workout','meals','care','history','settings']){a.page(route);assert.equal(a.q('.date-tools').hidden,false);assert.ok(a.q('#datePickerButton').textContent);}
+ const mobile=setup(t,{width:375});assert.ok(mobile.q('#mobileHeader .date-tools'));assert.ok(mobile.q('#mobileHeader .header-overview'));
+});
+test('glass calendar selects a month year and date without writing unrelated daily records',t=>{
+ const a=setup(t);a.date('2026-10-22');a.page('water');a.click('#datePickerButton');assert.equal(a.q('#datePicker').dataset.open,'true');
+ a.change('#calendarMonth','0');a.change('#calendarYear','2027');a.click('[data-calendar-date="2027-01-15"]');
+ assert.equal(a.q('#selectedDate').value,'2027-01-15');assert.equal(a.q('#datePicker').dataset.open,'false');assert.equal(a.w.localStorage.getItem(KEY),null);
+ a.click('#nextDate');assert.equal(a.q('#selectedDate').value,'2027-01-16');a.click('#prevDate');assert.equal(a.q('#selectedDate').value,'2027-01-15');
+});
+test('calendar supports arrow keys escape and live language changes',t=>{
+ const a=setup(t);a.date('2026-10-22');a.click('#datePickerButton');
+ a.q('[data-calendar-date="2026-10-22"]').dispatchEvent(new a.w.KeyboardEvent('keydown',{key:'ArrowRight',bubbles:true}));
+ assert.equal(a.w.document.activeElement.dataset.calendarDate,'2026-10-23');
+ a.q('#datePicker').dispatchEvent(new a.w.KeyboardEvent('keydown',{key:'Escape',bubbles:true}));assert.equal(a.q('#datePicker').dataset.open,'false');
+ a.click('[data-language="en"]');assert.doesNotMatch(a.q('#datePickerButton').textContent,/[ก-๙]/);a.click('#datePickerButton');assert.equal(a.q('#calendarMonth option[value="9"]').textContent,'October');
+ a.click('[data-language="th"]');assert.equal(a.q('#calendarMonth option[value="9"]').textContent,'ตุลาคม');
+});
+
+test('changing the shared date preserves an unsaved body profile without saving it',t=>{
+ const a=setup(t);a.page('body');for(const [name,value] of Object.entries({age:'22',sex:'male',height:'173',weight:'56',activity:'light'}))a.q('#bodyForm [name="'+name+'"]').value=value;
+ a.click('#nextDate');assert.equal(a.q('#bodyForm [name="age"]').value,'22');assert.equal(a.q('#bodyForm [name="weight"]').value,'56');assert.equal(a.w.localStorage.getItem(KEY),null);assert.notEqual(a.q('#bodyBmi').textContent,'—');
+});

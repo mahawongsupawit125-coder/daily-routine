@@ -404,7 +404,7 @@
   document.querySelectorAll('[data-language]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.language===language)));
   observer?.observe(document.body,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['aria-label','placeholder','title','alt']});
  }
- function setLanguage(value){if(!['th','en'].includes(value))return;language=value;try{localStorage.setItem(key,value);}catch{}apply();}
+ function setLanguage(value){if(!['th','en'].includes(value))return;language=value;try{localStorage.setItem(key,value);}catch{}apply();document.dispatchEvent(new CustomEvent('your-day-language'));}
  observer=new MutationObserver(()=>{if(!queued){queued=true;queueMicrotask(()=>{queued=false;if(alive&&document.body)apply();});}});
  document.addEventListener('click',event=>{const button=event.target.closest('[data-language]');if(button)setLanguage(button.dataset.language);});
  window.JaiI18n={apply,setLanguage,destroy:()=>{alive=false;observer.disconnect();},getLanguage:()=>language,t:text=>language==='en'?english(String(text)):String(text)};
