@@ -265,3 +265,16 @@ html[lang="en"] .overview-topic strong{font-size:11px}html[lang="en"] .overview-
 @media print{.mobile-header,.calendar-popover{display:none!important}.overview-view main{height:auto}}
 
 .body-icon-layout #bodyForm .body-save-card{display:flex;flex-direction:column;align-items:flex-end;gap:8px;padding:0 16px;background:transparent;border:0;box-shadow:none}.body-icon-layout #bodyForm .body-save-card .btn{align-self:flex-end;margin:0}.body-icon-layout #bodyForm .body-save-card #bodyError:not(:empty){align-self:stretch;margin:0}
+
+/* Compact body results use the same glass tiles as the overview counters. */
+.overview-panel-content .body-card-layout .body-results{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.overview-panel-content .body-card-layout .body-metric{min-height:132px;padding:14px 10px;text-align:center;justify-content:center;border-radius:22px}
+.overview-panel-content .body-card-layout .body-value{order:-1;margin:0 0 6px;gap:2px}
+.overview-panel-content .body-card-layout .body-value output,.overview-panel-content .body-card-layout #bodyBmi{font-size:clamp(18px,1.8vw,24px);line-height:1.35;font-weight:600}
+.overview-panel-content .body-card-layout .body-value>span{font-size:10px}
+.overview-panel-content .body-card-layout .body-metric h3{font-size:11px;line-height:1.5;color:var(--ink)}
+.overview-panel-content .body-card-layout .body-metric>p{font-size:10px;line-height:1.5;margin:6px 0 0}
+.overview-panel-content .body-results-heading{margin-bottom:12px}.overview-panel-content .body-results-heading h2{font-size:20px}
+@media(max-width:700px){.overview-panel-content .body-card-layout .body-results{grid-template-columns:repeat(2,minmax(0,1fr))}.overview-panel-content .body-card-layout .body-metric{min-height:122px}.overview-panel-content .body-card-layout .body-value output,.overview-panel-content .body-card-layout #bodyBmi{font-size:22px}}
+
+.overview-panel-content .body-card-layout #bodyWeightRange{font-size:clamp(14px,1.25vw,18px);white-space:nowrap}
