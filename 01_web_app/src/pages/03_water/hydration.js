@@ -6,26 +6,16 @@
  const range=r=>r?`${liters(r.min)}–${liters(r.max)} ลิตร`:'—';
  const reasonText=reason=>reason==='profile-required'?'ยังไม่มีข้อมูลร่างกายที่บันทึกไว้ กรุณากรอกข้อมูลก่อน':reason==='individual-plan'?'ควรใช้แผนปริมาณน้ำเฉพาะบุคคล จึงไม่แสดงตัวเลขจากสูตรทั่วไปสำหรับข้อมูลชุดนี้':'';
  const linkBody='<button class="btn soft" data-page="body">ไปคำนวณ / แก้ข้อมูลร่างกาย</button>';
- function contextText(h,r){
-  const parts=[];
-  parts.push(h.weather==='unknown'?'ยังไม่ระบุอากาศ':h.weather==='hot'?'อากาศร้อนหรืออบอ้าว: ความต้องการน้ำอาจเพิ่มตามเหงื่อ':'อากาศสบาย / อยู่ในที่เย็น');
-  parts.push(h.activityMinutes===null?'ยังไม่ระบุกิจกรรม':h.activityMinutes>0?`กิจกรรมที่มีเหงื่อ ${h.activityMinutes} นาที: ควรพิจารณาการเสียเหงื่อจริง`:'ระบุว่าไม่มีกิจกรรมที่มีเหงื่อในวันนี้');
-  if(r.flags.includes('adjustment-unknown'))parts.push('ช่วงที่แสดงยังเป็นค่าพื้นฐาน ยังไม่ได้ประเมินน้ำเพิ่มเติมสำหรับเหงื่อ');
-  else if(h.extraMl!==null)parts.push(`น้ำปรับเพิ่มที่คุณระบุ ${number(h.extraMl)} มล. รวมครั้งเดียวแล้ว`);
-  return parts.join(' · ');
- }
+ const statIcon=kind=>{const paths={reference:'M12 3C9 7 5 11 5 15a7 7 0 0 0 14 0c0-4-4-8-7-12ZM8 15a4 4 0 0 0 4 4',total:'M5 4h14l-2 17H7L5 4Zm1 7c4-3 7 3 12 0',remaining:'M5 12h14m-5-5 5 5-5 5M5 5v14'};return `<span class="hydration-stat-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="${paths[kind]}"/></svg></span>`;};
  function results(profile,h,waterMl){
   const r=C.hydrationEstimate(profile,h,waterMl),incomplete=r.flags.includes('adjustment-unknown');
-  return `<div class="hydration-stats"><div><span class="small muted">${incomplete?'ช่วงพื้นฐาน · ยังไม่รวมการปรับจากเหงื่อ':'ช่วงของเหลวอ้างอิงต่อวัน'}</span><strong id="hydrationReference">${range(r.reference)}</strong></div><div><span class="small muted">${h.otherDrinksMl===null?'ยอดที่ทราบ · ยังไม่รวมเครื่องดื่มอื่น':'น้ำและเครื่องดื่มอื่นที่บันทึกรวม'}</span><strong id="hydrationKnownTotal">${liters(r.knownTotalMl)} ลิตร</strong></div><div><span class="small muted">ส่วนต่างเทียบช่วงอ้างอิงจากที่บันทึก</span><strong id="hydrationRemaining">${range(r.remaining)}</strong></div></div>
-   <p id="hydrationReason" class="small">${e(reasonText(r.reason))}</p>${!profile?linkBody:''}
-   ${r.base?`<p class="small muted">น้ำหนักล่าสุด ${number(profile.weight,1)} กก. × 30–35 มล./กก. = ช่วงพื้นฐาน ${range(r.base)}${h.extraMl!==null?` · ปรับเพิ่มตามที่ระบุ ${liters(h.extraMl)} ลิตร`:''}</p>`:''}
-   <p id="hydrationContext" class="small">${e(contextText(h,r))}</p>${h.otherDrinksMl===null?'<p class="small muted">ใส่ปริมาณเครื่องดื่มอื่น หรือใส่ 0 เมื่อยืนยันว่าไม่มี จึงจะแสดงส่วนต่างได้</p>':''}
-   <p class="small muted">เป็นค่าอ้างอิงเพื่อวางแผน ไม่ใช่คำสั่งว่าต้องดื่มให้ครบ ส่วนต่างไม่ใช่การวัดภาวะขาดน้ำ ตัวเลขนี้นับน้ำและเครื่องดื่มรวมกัน ไม่ใช่น้ำเปล่าที่ต้องดื่มเพิ่มทั้งหมด</p>`;
+  return `<div class="hydration-stats"><div>${statIcon('reference')}<span class="small muted">${incomplete?'ช่วงพื้นฐาน · ยังไม่รวมการปรับจากเหงื่อ':'ช่วงของเหลวอ้างอิงต่อวัน'}</span><strong id="hydrationReference" aria-describedby="hydrationReason">${range(r.reference)}</strong></div><div>${statIcon('total')}<span class="small muted">${h.otherDrinksMl===null?'ยอดที่ทราบ · ยังไม่รวมเครื่องดื่มอื่น':'น้ำและเครื่องดื่มอื่นที่บันทึกรวม'}</span><strong id="hydrationKnownTotal">${liters(r.knownTotalMl)} ลิตร</strong></div><div>${statIcon('remaining')}<span class="small muted">ส่วนต่างเทียบช่วงอ้างอิงจากที่บันทึก</span><strong id="hydrationRemaining">${range(r.remaining)}</strong></div></div>
+   <p id="hydrationReason" class="sr-only">${e(reasonText(r.reason))}</p>${!profile?linkBody:''}`;
  }
  function render(profile,context,waterMl){
   const h=context||C.hydrationDefaults();
   const field=(title,name,max,step,hint)=>`<label class="field"><span>${title}</span><input name="${name}" type="number" inputmode="decimal" min="0" max="${max}" step="${step}" value="${e(h[name]??'')}" placeholder="ยังไม่ระบุ"><small>${hint}</small></label>`;
-  return `<section class="card hydration-card"><div class="card-header"><div><p class="eyebrow">YOUR PERSONAL HYDRATION</p><h2>น้ำอ้างอิงสำหรับคุณ</h2><p>เชื่อมจากข้อมูลร่างกายล่าสุด · อากาศ กิจกรรม และเครื่องดื่มแยกตามวันที่เลือก</p></div></div><div id="hydrationResults" aria-live="polite">${results(profile,h,waterMl)}</div>
+  return `<section class="card hydration-card"><div id="hydrationResults" aria-live="polite">${results(profile,h,waterMl)}</div>
    <details class="hydration-details" open><summary>อากาศ กิจกรรม และเครื่องดื่มวันนี้</summary><form id="hydrationForm"><div class="body-fields">
    ${field('เครื่องดื่มอื่นที่ดื่มแล้วรวม (มล.)','otherDrinksMl',10000,1,'เช่น นม ชา กาแฟ น้ำผลไม้ · ไม่รวมน้ำที่ติ๊กในตาราง และไม่รวมแอลกอฮอล์')}
    <label class="field"><span>อากาศที่คุณพบวันนี้ (เลือกเอง)</span><select name="weather">${[['unknown','ยังไม่ทราบ'],['normal','อากาศสบาย / อยู่ในที่เย็น'],['hot','ร้อน / อบอ้าว / เสียเหงื่อจากอากาศ']].map(([key,title])=>`<option value="${key}" ${h.weather===key?'selected':''}>${title}</option>`).join('')}</select><small>เลือกตามสภาพจริง ไม่ดึงอากาศหรือเดาตำแหน่งของคุณ</small></label>
